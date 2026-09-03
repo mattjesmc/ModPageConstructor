@@ -1,0 +1,136 @@
+# modpage.yml -- the single source of truth for this mod's pages.
+# Build with:  modpage build          (README.md + dist/modrinth.md + dist/curseforge.md)
+# List the shared skeleton with:  modpage sections
+
+name: My Mod
+slug: my-mod                      # Modrinth/CurseForge slug; used by the download badge
+tagline: One line that sells the mod.
+authors: [Your Name]
+license: MIT
+
+assets:
+  dir: assets
+  banner_dir: banners
+  # Modrinth and CurseForge cannot read repo-relative paths, so images need an
+  # absolute prefix. Point this at the raw host for this repo:
+  base_url: https://raw.githubusercontent.com/USER/REPO/main/
+
+links:
+  github: https://github.com/USER/REPO
+  # modrinth: https://modrinth.com/mod/my-mod
+  # curseforge: https://www.curseforge.com/minecraft/mc-mods/my-mod
+  # issues: https://github.com/USER/REPO/issues
+  # discord: https://discord.gg/XXXX
+  # wiki: https://github.com/USER/REPO/wiki
+
+minecraft:
+  versions: ["1.21.1"]
+  loaders: [Fabric]
+  environment: Client & Server     # free text: Client, Server, or both
+
+badges:
+  style: for-the-badge
+  color: 5b21b6
+  # show: [modrinth, curseforge, github, loaders, versions, license, discord]
+  # extra:
+  #   - alt: Ko-fi
+  #     image: https://img.shields.io/badge/Ko--fi-Support-FF5E5B?style=for-the-badge
+  #     url: https://ko-fi.com/you
+
+header:
+  # banner: banners/header.png     # auto-detected if the file exists
+  # width: 720
+  # section_banner_width: 520
+  # heading_with_banner: false     # also print a text heading under each banner
+
+sections:
+  about: |
+    What the mod does, in a paragraph or two. Markdown works here.
+
+  features:
+    items:
+      - title: First feature
+        description: What it does and why it is nice.
+      - Second feature, as a bare line
+
+  # gallery:
+  #   images:
+  #     - src: gallery/overview.png
+  #       caption: The thing, in game
+
+  # Recipe cards are extracted from this repo's data files and rendered to
+  # images in assets/recipes/. Delete this block if the mod has no recipes.
+  recipes:
+    columns: 3           # cards per row
+    scale: 3             # 3 = 48px items
+    collapsed: true      # fold behind a <details> (GitHub + Modrinth)
+    # summary: "Show all recipes"
+    # paths: [src/main/resources/data]   # where to look for data/<ns>/recipe/*.json
+    # include: ["my-mod:*"]              # glob filters on recipe id
+    # exclude: ["*_from_*"]
+    # cycle_ms: 1000     # GIF frame time for tag ingredients
+    # max_frames: 8      # cap on cycled alternatives per slot
+    # vanilla: auto      # auto | off | path/to/extracted/assets
+    # out: recipes       # subfolder under assets/
+    # labels:            # override a card's caption (default: its file name)
+    #   "my-mod:tricky_recipe": "The Good Name"
+    # icons:             # items with no flat texture (shields, banners, 3D blocks)
+    #   minecraft:shield: icons/shield.png     # relative to assets.dir
+    # custom_types:      # modded recipe types the tool cannot know about
+    #   "my-mod:my_smithing_type":
+    #     layout: smithing     # shaped | shapeless | single | smithing
+    #     result: base         # template | base | addition | an explicit item id
+
+  # Shared by every mod page, rendered even when empty.
+  dependencies:
+    required:
+      - name: Fabric API
+        url: https://modrinth.com/mod/fabric-api
+        version: ">=0.100.0"
+        note: Required on both sides
+    optional: []
+    bundled: []
+    # empty_text: "**None.** This mod is standalone."
+
+  # Shared by every mod page, rendered even when empty.
+  incompatibilities:
+    known: []
+    #  - name: Some Mod
+    #    url: https://modrinth.com/mod/some-mod
+    #    reason: Both rewrite the same chunk section
+    #    workaround: Disable X in its config
+    # empty_text: "**None known.** No conflicts have been reported."
+
+  installation: |
+    1. Install [Fabric Loader](https://fabricmc.net/use/).
+    2. Drop this mod and its dependencies into `mods/`.
+    3. Launch the game.
+
+  # configuration: |
+  #   The config lives at `config/my-mod.json`.
+
+  # faq:
+  #   items:
+  #     - q: Does it work on servers?
+  #       a: Yes, install it on both sides.
+
+  # credits: |
+  #   Thanks to ...
+
+  # license: rendered from the top-level `license:` unless you write a body here.
+
+# custom_sections:
+#   - id: performance
+#     title: Performance
+#     after: features          # where it slots into the shared order
+#     body: |
+#       Measured on ...
+
+# Per-target output paths (defaults shown).
+# outputs:
+#   readme: README.md
+#   modrinth: dist/modrinth.md
+#   curseforge: dist/curseforge.md        # paste into CurseForge's Markdown editor
+#   curseforge-html: dist/curseforge.html # opt-in: modpage build -t curseforge-html
+
+# footer: "Made with care. Issues and PRs welcome."

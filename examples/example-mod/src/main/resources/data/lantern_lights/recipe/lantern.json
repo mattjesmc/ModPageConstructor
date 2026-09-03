@@ -1,0 +1,6 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": ["nnn", "n#n", "nnn"],
+  "key": { "n": "minecraft:iron_nugget", "#": "minecraft:torch" },
+  "result": { "id": "lantern_lights:glow_lantern", "count": 1 }
+}

@@ -1,0 +1,145 @@
+{#
+  Markdown macros with no raw HTML at all, for CurseForge's Markdown editor.
+
+  CurseForge's description editor has two modes, WYSIWYG and Markdown, and no
+  HTML source view. Its Markdown mode escapes inline HTML instead of rendering
+  it, so <p align="center">, <img width>, <table>, <details> and <br> all come
+  out as literal text -- which is why pasting the Modrinth page there only half
+  works. Everything here is plain CommonMark plus pipe tables: images are
+  ![alt](url), badges are [![alt](img)](url), grids are tables. The price is
+  that nothing can be centred or resized, so pre-scale banners to the width
+  you want them shown at.
+
+  The shape-only macros (dependency tables, FAQ, bodies) are already pure
+  Markdown in md.j2 and are reused from there.
+#}
+{% import partials + "/md.j2" as md with context %}
+
+{%- macro img(src, alt='') -%}
+![{{ alt | replace('|', '\|') | replace(']', '') }}]({{ asset(src) }})
+{%- endmacro -%}
+
+{%- macro cell(text) -%}
+{{ text | replace('|', '\|') | replace('\n', ' ') }}
+{%- endmacro -%}
+
+{% macro section_header(section) %}
+{% if section.banner %}
+
+{{ img(section.banner, section.title) }}
+{% if header.heading_with_banner %}
+
+### {{ section.title }}
+{% endif %}
+{% else %}
+
+## {{ section.title }}
+{% endif %}
+{% endmacro %}
+
+{% macro page_header() %}
+{% if header.banner %}
+{{ img(header.banner, cfg.name) }}
+{% endif %}
+{% if header.show_title %}
+
+# {{ cfg.name }}
+{% endif %}
+{% if cfg.tagline %}
+
+*{{ cfg.tagline }}*
+{% endif %}
+{% if badges %}
+
+{% for badge in badges %}{% if badge.url %}[![{{ badge.alt }}]({{ badge.image }})]({{ badge.url }}){% else %}![{{ badge.alt }}]({{ badge.image }}){% endif %}{% if not loop.last %} {% endif %}{% endfor %}
+
+{% endif %}
+{% if minecraft.loaders or minecraft.versions or minecraft.environment %}
+
+{% if minecraft.loaders %}**Loaders:** {{ minecraft.loaders | join(', ') }}{% if minecraft.versions or minecraft.environment %} • {% endif %}{% endif %}{% if minecraft.versions %}**Minecraft:** {{ minecraft.versions | join(', ') }}{% if minecraft.environment %} • {% endif %}{% endif %}{% if minecraft.environment %}**Side:** {{ minecraft.environment }}{% endif %}
+
+{% endif %}
+{% endmacro %}
+
+{% macro link_row() %}
+{% if cfg.link_items %}
+
+{% for item in cfg.link_items %}[{{ item.label }}]({{ item.url }}){% if not loop.last %} • {% endif %}{% endfor %}
+
+{% endif %}
+{% endmacro %}
+
+{% macro features(section) %}
+{{ md.body(section) }}
+{% for item in section.data['items'] %}
+{% if item.image %}
+
+{{ img(item.image, item.title) }}
+
+**{{ item.title }}**{% if item.description %} — {{ item.description }}{% endif %}
+
+{% else %}
+- **{{ item.title }}**{% if item.description %} — {{ item.description }}{% endif %}
+
+{% endif %}
+{% endfor %}
+{% endmacro %}
+
+{% macro gallery(section) %}
+{{ md.body(section) }}
+{% for image in section.data['images'] %}
+
+{{ img(image.src, image.alt or image.caption or cfg.name) }}
+{% if image.caption %}
+
+*{{ image.caption }}*
+{% endif %}
+{% endfor %}
+{% endmacro %}
+
+{#- A pipe table is the only grid Markdown has. The first row of cards doubles
+    as the table header, every image row is followed by its caption row, and
+    the column alignment colons centre the cards. Nothing is collapsed:
+    CurseForge's Markdown has no <details>. -#}
+{% macro recipe_grid(section) %}
+{% set columns = section.data['options'].get('columns', 3) %}
+{% for row in section.data['images'] | batch(columns) %}
+|{% for image in row %} {{ img(image.relative, image.recipe.type_label ~ ' recipe for ' ~ image.recipe.display) }} |{% endfor %}
+
+{% if loop.first %}
+|{% for _ in row %} :---: |{% endfor %}
+
+{% endif %}
+|{% for image in row %} {{ cell(image.recipe.display) }}{% if image.recipe.type != 'minecraft:crafting_shaped' %} *({{ image.recipe.type_label }})*{% endif %} |{% endfor %}
+
+{% endfor %}
+{% endmacro %}
+
+{% macro recipes(section) %}
+{{ md.body(section) }}
+{% if section.data['images'] %}
+
+{{ recipe_grid(section) }}
+{% elif not section.body %}
+
+{{ section.empty_text }}
+{% endif %}
+{% endmacro %}
+
+{% macro section_body(section) %}
+{% if section.id == 'dependencies' %}
+{{ md.dependencies(section) }}
+{% elif section.id == 'incompatibilities' %}
+{{ md.incompatibilities(section) }}
+{% elif section.id == 'features' %}
+{{ features(section) }}
+{% elif section.id == 'gallery' %}
+{{ gallery(section) }}
+{% elif section.id == 'faq' %}
+{{ md.faq(section) }}
+{% elif section.id == 'recipes' %}
+{{ recipes(section) }}
+{% else %}
+{{ md.body(section) }}
+{% endif %}
+{% endmacro %}

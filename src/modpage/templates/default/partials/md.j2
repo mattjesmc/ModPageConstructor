@@ -1,0 +1,256 @@
+{#
+  Markdown macros shared by the README and Modrinth targets.
+  `target` is "readme" or "modrinth"; GitHub tolerates more raw HTML than
+  Modrinth's sanitiser, so a few flourishes are gated on it.
+#}
+
+{%- macro link(item) -%}
+{% if item.url %}[{{ item.name }}]({{ item.url }}){% else %}{{ item.name }}{% endif %}
+{%- endmacro -%}
+
+{%- macro image(src, alt='', width=None) -%}
+<img src="{{ asset(src) }}" alt="{{ alt }}"{% if width %} width="{{ width }}"{% endif %}>
+{%- endmacro -%}
+
+{%- macro centered(content) -%}
+<p align="center">
+  {{ content }}
+</p>
+{%- endmacro -%}
+
+{#- A section opens with its banner image, or a plain heading when the repo
+    has not supplied one. The anchor keeps in-page links working either way. -#}
+{% macro section_header(section) %}
+{% if section.banner %}
+<a id="{{ section.id }}"></a>
+<p align="center">
+  <img src="{{ asset(section.banner) }}" alt="{{ section.title }}"{% if header.section_banner_width %} width="{{ header.section_banner_width }}"{% endif %}>
+</p>
+{% if header.heading_with_banner %}
+
+### {{ section.title }}
+{% endif %}
+{% else %}
+
+## {{ section.title }}
+{% endif %}
+{% endmacro %}
+
+{% macro page_header() %}
+{% if header.banner %}
+<p align="center">
+  <img src="{{ asset(header.banner) }}" alt="{{ cfg.name }}"{% if header.width %} width="{{ header.width }}"{% endif %}>
+</p>
+{% endif %}
+{% if header.show_title %}
+
+<h1 align="center">{{ cfg.name }}</h1>
+{% endif %}
+{% if cfg.tagline %}
+
+<p align="center"><i>{{ cfg.tagline }}</i></p>
+{% endif %}
+{% if badges %}
+
+<p align="center">
+{% for badge in badges %}
+{% if badge.url %}  <a href="{{ badge.url }}"><img alt="{{ badge.alt }}" src="{{ badge.image }}"></a>
+{% else %}  <img alt="{{ badge.alt }}" src="{{ badge.image }}">
+{% endif %}
+{% endfor %}
+</p>
+{% endif %}
+{% if minecraft.versions or minecraft.loaders or minecraft.environment %}
+
+<p align="center">
+  {% if minecraft.loaders %}<b>Loaders:</b> {{ minecraft.loaders | join(', ') }}{% if minecraft.versions or minecraft.environment %} &nbsp;•&nbsp; {% endif %}{% endif %}{% if minecraft.versions %}<b>Minecraft:</b> {{ minecraft.versions | join(', ') }}{% if minecraft.environment %} &nbsp;•&nbsp; {% endif %}{% endif %}{% if minecraft.environment %}<b>Side:</b> {{ minecraft.environment }}{% endif %}
+
+</p>
+{% endif %}
+{% endmacro %}
+
+{% macro body(section) %}
+{% if section.body %}
+
+{{ section.body }}
+{% endif %}
+{% endmacro %}
+
+{% macro features(section) %}
+{{ body(section) }}
+{% for item in section.data['items'] %}
+{% if item.image %}
+
+<table><tr>
+<td width="200"><img src="{{ asset(item.image) }}" alt="{{ item.title }}"></td>
+<td><b>{{ item.title }}</b><br>{{ item.description or '' }}</td>
+</tr></table>
+{% else %}
+- **{{ item.title }}**{% if item.description %} — {{ item.description }}{% endif %}
+
+{% endif %}
+{% endfor %}
+{% endmacro %}
+
+{% macro gallery(section) %}
+{{ body(section) }}
+{% for img in section.data['images'] %}
+
+<p align="center">
+  <img src="{{ asset(img.src) }}" alt="{{ img.alt or img.caption or cfg.name }}"{% if img.width %} width="{{ img.width }}"{% endif %}>
+{% if img.caption %}
+  <br><sub><i>{{ img.caption }}</i></sub>
+{% endif %}
+</p>
+{% endfor %}
+{% endmacro %}
+
+{% macro dep_table(title, items) %}
+
+**{{ title }}**
+
+| Mod | Version | Notes |
+| --- | --- | --- |
+{% for item in items %}
+| {{ link(item) }} | {{ item.version or item.versions or '—' }} | {{ item.note or item.notes or '' }} |
+{% endfor %}
+{% endmacro %}
+
+{#- Always rendered: an explicit "None" is as useful to a reader as a list. -#}
+{% macro dependencies(section) %}
+{{ body(section) }}
+{% if section.data['required'] or section.data['optional'] or section.data['bundled'] %}
+{% if section.data['required'] %}
+{{ dep_table('Required', section.data['required']) }}
+{% endif %}
+{% if section.data['optional'] %}
+{{ dep_table('Optional', section.data['optional']) }}
+{% endif %}
+{% if section.data['bundled'] %}
+{{ dep_table('Bundled (no download needed)', section.data['bundled']) }}
+{% endif %}
+{% elif not section.body %}
+
+{{ section.empty_text }}
+{% endif %}
+{% endmacro %}
+
+{% macro incompatibilities(section) %}
+{{ body(section) }}
+{% if section.data['known'] %}
+
+| Mod | Conflict | Workaround |
+| --- | --- | --- |
+{% for item in section.data['known'] %}
+| {{ link(item) }} | {{ item.reason or item.note or '—' }} | {{ item.workaround or '—' }} |
+{% endfor %}
+{% elif not section.body %}
+
+{{ section.empty_text }}
+{% endif %}
+{% endmacro %}
+
+{% macro faq(section) %}
+{{ body(section) }}
+{% for item in section.data['items'] %}
+{% if target == 'readme' %}
+
+<details>
+<summary><b>{{ item.question }}</b></summary>
+
+{{ item.answer }}
+
+</details>
+{% else %}
+
+**{{ item.question }}**
+
+{{ item.answer }}
+{% endif %}
+{% endfor %}
+{% endmacro %}
+
+{#- Recipe cards are pre-rendered images, laid out in a compact grid and
+    folded away behind a <details> so they never dominate the page. GitHub and
+    Modrinth both support <details>. CurseForge renders no HTML at all in its
+    Markdown mode, so it gets a pipe-table grid from plain.j2 instead. -#}
+{% macro recipe_grid(section) %}
+{% set opts = section.data['options'] %}
+{% set columns = opts.get('columns', 3) %}
+<table>
+{% for row in section.data['images'] | batch(columns) %}
+<tr>
+{% for image in row %}
+<td align="center" width="{{ (100 / columns) | round | int }}%"><img src="{{ asset(image.relative) }}" alt="{{ image.recipe.type_label }} recipe for {{ image.recipe.display }}"><br><sub>{{ image.recipe.display }}{% if image.recipe.type != 'minecraft:crafting_shaped' %} <i>({{ image.recipe.type_label }})</i>{% endif %}</sub></td>
+{% endfor %}
+</tr>
+{% endfor %}
+</table>
+{% endmacro %}
+
+{% macro recipes(section) %}
+{{ body(section) }}
+{% set opts = section.data['options'] %}
+{% set images = section.data['images'] %}
+{% if images %}
+{% set collapse = opts.get('collapsed', True) and target in opts.get('collapse_targets', ['readme', 'modrinth']) %}
+{% if collapse %}
+
+<details>
+<summary><b>{{ opts.get('summary') or (images | length ~ ' recipes -- click to expand') }}</b></summary>
+
+{{ recipe_grid(section) }}
+
+</details>
+{% else %}
+{{ recipe_grid(section) }}
+{% endif %}
+{% elif not section.body %}
+
+{{ section.empty_text }}
+{% endif %}
+{% endmacro %}
+
+{#- Dispatch: every section id routes to the macro that knows its shape. -#}
+{% macro section_body(section) %}
+{% if section.id == 'dependencies' %}
+{{ dependencies(section) }}
+{% elif section.id == 'incompatibilities' %}
+{{ incompatibilities(section) }}
+{% elif section.id == 'features' %}
+{{ features(section) }}
+{% elif section.id == 'gallery' %}
+{{ gallery(section) }}
+{% elif section.id == 'faq' %}
+{{ faq(section) }}
+{% elif section.id == 'recipes' %}
+{{ recipes(section) }}
+{% else %}
+{{ body(section) }}
+{% endif %}
+{% endmacro %}
+
+{% macro link_row() %}
+{% if cfg.link_items %}
+
+<p align="center">
+  {% for item in cfg.link_items %}<a href="{{ item.url }}">{{ item.label }}</a>{% if not loop.last %} &nbsp;•&nbsp; {% endif %}{% endfor %}
+</p>
+{% endif %}
+{% endmacro %}
+
+{% macro page(sections) %}
+{{ page_header() }}
+{% for section in sections %}
+
+---
+{{ section_header(section) }}
+{{ section_body(section) }}
+{% endfor %}
+{% if cfg.footer %}
+
+---
+
+{{ cfg.footer }}
+{% endif %}
+{% endmacro %}

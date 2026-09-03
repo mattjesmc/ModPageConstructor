@@ -1,0 +1,176 @@
+{#
+  HTML macros for the CurseForge description editor. CurseForge sanitises the
+  markup it is given, so this sticks to the tags it reliably keeps: headings,
+  paragraphs with align, images, links, tables, lists and rules. No inline CSS,
+  no <details>.
+#}
+
+{%- macro link(item) -%}
+{% if item.url %}<a href="{{ item.url }}">{{ item.name | e }}</a>{% else %}{{ item.name | e }}{% endif %}
+{%- endmacro -%}
+
+{% macro section_header(section) %}
+{% if section.banner %}
+<p align="center"><img src="{{ asset(section.banner) }}" alt="{{ section.title }}"{% if header.section_banner_width %} width="{{ header.section_banner_width }}"{% endif %}></p>
+{% if header.heading_with_banner %}
+<h2>{{ section.title }}</h2>
+{% endif %}
+{% else %}
+<h2>{{ section.title }}</h2>
+{% endif %}
+{% endmacro %}
+
+{% macro page_header() %}
+{% if header.banner %}
+<p align="center"><img src="{{ asset(header.banner) }}" alt="{{ cfg.name | e }}"{% if header.width %} width="{{ header.width }}"{% endif %}></p>
+{% endif %}
+{% if header.show_title %}
+<h1 align="center">{{ cfg.name | e }}</h1>
+{% endif %}
+{% if cfg.tagline %}
+<p align="center"><em>{{ cfg.tagline | e }}</em></p>
+{% endif %}
+{% if badges %}
+<p align="center">
+{% for badge in badges %}
+{% if badge.url %}<a href="{{ badge.url }}"><img src="{{ badge.image }}" alt="{{ badge.alt }}"></a>{% else %}<img src="{{ badge.image }}" alt="{{ badge.alt }}">{% endif %}&nbsp;
+{% endfor %}
+</p>
+{% endif %}
+{% if minecraft.loaders or minecraft.versions or minecraft.environment %}
+<p align="center">
+{% if minecraft.loaders %}<strong>Loaders:</strong> {{ minecraft.loaders | join(', ') | e }}{% if minecraft.versions or minecraft.environment %} &bull; {% endif %}{% endif %}
+{% if minecraft.versions %}<strong>Minecraft:</strong> {{ minecraft.versions | join(', ') | e }}{% if minecraft.environment %} &bull; {% endif %}{% endif %}
+{% if minecraft.environment %}<strong>Side:</strong> {{ minecraft.environment | e }}{% endif %}
+</p>
+{% endif %}
+{% endmacro %}
+
+{% macro body(section) %}
+{% if section.body %}
+{{ section.body | md }}
+{% endif %}
+{% endmacro %}
+
+{% macro features(section) %}
+{{ body(section) }}
+{% set plain = section.data['items'] | rejectattr('image', 'defined') | list %}
+{% if plain | length == section.data['items'] | length %}
+<ul>
+{% for item in section.data['items'] %}
+<li><strong>{{ item.title | e }}</strong>{% if item.description %} &mdash; {{ item.description | inline_md }}{% endif %}</li>
+{% endfor %}
+</ul>
+{% else %}
+{% for item in section.data['items'] %}
+{% if item.image %}
+<p align="center"><img src="{{ asset(item.image) }}" alt="{{ item.title | e }}"></p>
+{% endif %}
+<p><strong>{{ item.title | e }}</strong>{% if item.description %}<br>{{ item.description | inline_md }}{% endif %}</p>
+{% endfor %}
+{% endif %}
+{% endmacro %}
+
+{% macro gallery(section) %}
+{{ body(section) }}
+{% for img in section.data['images'] %}
+<p align="center"><img src="{{ asset(img.src) }}" alt="{{ img.alt or img.caption or cfg.name }}"{% if img.width %} width="{{ img.width }}"{% endif %}>
+{% if img.caption %}
+<br><sub><em>{{ img.caption | e }}</em></sub>
+{% endif %}
+</p>
+{% endfor %}
+{% endmacro %}
+
+{% macro dep_table(title, items) %}
+<p><strong>{{ title }}</strong></p>
+<table>
+<tr><th>Mod</th><th>Version</th><th>Notes</th></tr>
+{% for item in items %}
+<tr><td>{{ link(item) }}</td><td>{{ (item.version or item.versions) | e or '&mdash;' }}</td><td>{{ (item.note or item.notes or '') | e }}</td></tr>
+{% endfor %}
+</table>
+{% endmacro %}
+
+{% macro dependencies(section) %}
+{{ body(section) }}
+{% if section.data['required'] or section.data['optional'] or section.data['bundled'] %}
+{% if section.data['required'] %}
+{{ dep_table('Required', section.data['required']) }}
+{% endif %}
+{% if section.data['optional'] %}
+{{ dep_table('Optional', section.data['optional']) }}
+{% endif %}
+{% if section.data['bundled'] %}
+{{ dep_table('Bundled (no download needed)', section.data['bundled']) }}
+{% endif %}
+{% elif not section.body %}
+{{ section.empty_text | md }}
+{% endif %}
+{% endmacro %}
+
+{% macro incompatibilities(section) %}
+{{ body(section) }}
+{% if section.data['known'] %}
+<table>
+<tr><th>Mod</th><th>Conflict</th><th>Workaround</th></tr>
+{% for item in section.data['known'] %}
+<tr><td>{{ link(item) }}</td><td>{{ (item.reason or item.note) | e or '&mdash;' }}</td><td>{{ item.workaround | e or '&mdash;' }}</td></tr>
+{% endfor %}
+</table>
+{% elif not section.body %}
+{{ section.empty_text | md }}
+{% endif %}
+{% endmacro %}
+
+{% macro faq(section) %}
+{{ body(section) }}
+{% for item in section.data['items'] %}
+<p><strong>{{ item.question | e }}</strong><br>{{ item.answer | inline_md }}</p>
+{% endfor %}
+{% endmacro %}
+
+{% macro recipes(section) %}
+{{ body(section) }}
+{% set opts = section.data['options'] %}
+{% set columns = opts.get('columns', 3) %}
+{% if section.data['images'] %}
+<table>
+{% for row in section.data['images'] | batch(columns) %}
+<tr>
+{% for image in row %}
+<td align="center"><img src="{{ asset(image.relative) }}" alt="{{ image.recipe.type_label }} recipe for {{ image.recipe.display | e }}"><br><sub>{{ image.recipe.display | e }}{% if image.recipe.type != 'minecraft:crafting_shaped' %} <em>({{ image.recipe.type_label }})</em>{% endif %}</sub></td>
+{% endfor %}
+</tr>
+{% endfor %}
+</table>
+{% elif not section.body %}
+{{ section.empty_text | md }}
+{% endif %}
+{% endmacro %}
+
+{% macro section_body(section) %}
+{% if section.id == 'dependencies' %}
+{{ dependencies(section) }}
+{% elif section.id == 'incompatibilities' %}
+{{ incompatibilities(section) }}
+{% elif section.id == 'features' %}
+{{ features(section) }}
+{% elif section.id == 'gallery' %}
+{{ gallery(section) }}
+{% elif section.id == 'faq' %}
+{{ faq(section) }}
+{% elif section.id == 'recipes' %}
+{{ recipes(section) }}
+{% else %}
+{{ body(section) }}
+{% endif %}
+{% endmacro %}
+
+{% macro link_row() %}
+{% if cfg.link_items %}
+<p align="center">
+{% for item in cfg.link_items %}<a href="{{ item.url }}">{{ item.label }}</a>{% if not loop.last %} &bull; {% endif %}{% endfor %}
+</p>
+{% endif %}
+{% endmacro %}

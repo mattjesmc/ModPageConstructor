@@ -1,0 +1,7 @@
+{
+  "type": "minecraft:smelting",
+  "ingredient": "lantern_lights:raw_glow",
+  "result": { "id": "lantern_lights:glow_ingot" },
+  "experience": 0.7,
+  "cookingtime": 200
+}

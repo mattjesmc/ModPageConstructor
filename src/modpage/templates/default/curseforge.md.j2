@@ -1,0 +1,18 @@
+{% import partials + "/plain.j2" as cf with context %}
+{# No leading comment here on purpose: CurseForge's Markdown mode would show
+   it as text. Paste this whole file into the description editor with the
+   editor switched to Markdown. #}
+{{ cf.page_header() }}
+{{ cf.link_row() }}
+{% for section in sections %}
+
+---
+{{ cf.section_header(section) }}
+{{ cf.section_body(section) }}
+{% endfor %}
+{% if cfg.footer %}
+
+---
+
+{{ cfg.footer }}
+{% endif %}

@@ -1,0 +1,16 @@
+{% import partials + "/md.j2" as md with context %}
+{# Modrinth shows links and licence in its own sidebar, so the page itself
+   stays to the banner, the pitch, and the shared sections. #}
+{{ md.page_header() }}
+{% for section in sections %}
+
+---
+{{ md.section_header(section) }}
+{{ md.section_body(section) }}
+{% endfor %}
+{% if cfg.footer %}
+
+---
+
+{{ cfg.footer }}
+{% endif %}

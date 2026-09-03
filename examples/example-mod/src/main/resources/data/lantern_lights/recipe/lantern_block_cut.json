@@ -1,0 +1,5 @@
+{
+  "type": "minecraft:stonecutting",
+  "ingredient": "#lantern_lights:lantern_blocks",
+  "result": { "id": "lantern_lights:lantern_block", "count": 1 }
+}

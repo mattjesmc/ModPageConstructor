@@ -1,0 +1,6 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": ["pp", "pg"],
+  "key": { "p": "#minecraft:planks", "g": "lantern_lights:glow_ingot" },
+  "result": { "id": "lantern_lights:lantern_block", "count": 2 }
+}

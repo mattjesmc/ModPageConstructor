@@ -1,0 +1,99 @@
+name: Lantern Lights
+slug: lantern-lights
+tagline: Hand-placed lanterns that actually light the world.
+authors: [Matthijs]
+license: MIT
+
+assets:
+  dir: assets
+  base_url: https://raw.githubusercontent.com/Matthijs/lantern-lights/main/
+
+links:
+  github: https://github.com/Matthijs/lantern-lights
+  modrinth: https://modrinth.com/mod/lantern-lights
+  curseforge: https://www.curseforge.com/minecraft/mc-mods/lantern-lights
+  issues: https://github.com/Matthijs/lantern-lights/issues
+
+minecraft:
+  versions: ["1.21.1", "1.20.1"]
+  loaders: [Fabric, NeoForge]
+  environment: Client & Server
+
+badges:
+  style: for-the-badge
+  color: 5b21b6
+
+header:
+  width: 720
+  section_banner_width: 480
+
+sections:
+  about: |
+    Lantern Lights replaces the vanilla lantern with a dynamic light source that
+    follows the block it is attached to, so corridors, mineshafts and boats stay
+    lit without a single command block.
+
+    It is a drop-in change: no new items, no world data, nothing to migrate.
+
+  features:
+    items:
+      - title: Dynamic lighting
+        description: Lanterns emit light along the path they are carried.
+      - title: Zero config required
+        description: Sensible defaults out of the box; every value is tunable.
+      - Server-side friendly, with client-only rendering
+
+  gallery:
+    images:
+      - src: gallery/overview.png
+        caption: A lit mineshaft, no torches placed
+
+  recipes:
+    columns: 3
+    scale: 3
+    summary: "Show all recipes"
+    body: |
+      Every recipe below is generated straight from the mod's data files.
+
+  dependencies:
+    required:
+      - name: Fabric API
+        url: https://modrinth.com/mod/fabric-api
+        version: ">=0.100.0"
+        note: Fabric builds only
+    optional:
+      - name: Mod Menu
+        url: https://modrinth.com/mod/modmenu
+        note: In-game config screen
+
+  incompatibilities:
+    known:
+      - name: Shimmer
+        url: https://modrinth.com/mod/shimmer
+        reason: Both patch the light engine
+        workaround: Disable Shimmer's dynamic lights
+
+  installation: |
+    1. Install [Fabric Loader](https://fabricmc.net/use/) or NeoForge.
+    2. Drop `lantern-lights.jar` (and Fabric API on Fabric) into `mods/`.
+    3. Launch the game.
+
+  configuration: |
+    The config lives at `config/lantern-lights.json`:
+
+    | Key | Default | Meaning |
+    | --- | --- | --- |
+    | `radius` | `12` | Light radius in blocks |
+    | `smooth` | `true` | Fade light in and out |
+
+  faq:
+    items:
+      - q: Does it work on a server?
+        a: Yes. Install it on both sides for the full effect.
+      - q: Does it break shaders?
+        a: No, it uses the vanilla light engine.
+
+  credits: |
+    Textures by **@someone**. Thanks to the Fabric community for the light engine notes.
+
+footer: "Issues and pull requests are welcome."
