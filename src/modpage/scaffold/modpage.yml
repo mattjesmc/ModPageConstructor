@@ -2,6 +2,10 @@
 # Build with:  modpage build          (README.md + dist/modrinth.md + dist/curseforge.md)
 # List the shared skeleton with:  modpage sections
 
+# The config series this file is written for. Patch releases (0.4.1, 0.4.2, ...)
+# never change what a key means; only a new series (0.5) may. Keep it quoted.
+modpage: "{series}"
+
 name: My Mod
 slug: my-mod                      # Modrinth/CurseForge slug; used by the download badge
 tagline: One line that sells the mod.

@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 import argparse
-import shutil
 import sys
 from pathlib import Path
 
@@ -187,7 +186,7 @@ def cmd_init(args: argparse.Namespace) -> int:
         print(_paint(f"{target} already exists (use --force to overwrite)", RED))
         return 1
     root.mkdir(parents=True, exist_ok=True)
-    shutil.copyfile(SCAFFOLD, target)
+    target.write_text(scaffold_text(), encoding="utf-8", newline="\n")
     print(_paint(f"wrote: {target}", GREEN))
 
     for sub in ("banners", "gallery"):
@@ -221,13 +220,24 @@ def cmd_init(args: argparse.Namespace) -> int:
     return 0
 
 
+def scaffold_text() -> str:
+    """The starter ``modpage.yml``, declaring the config series it was written for."""
+    from . import SERIES
+
+    return SCAFFOLD.read_text(encoding="utf-8").replace("{series}", SERIES)
+
+
 def workflow_text() -> str:
-    """The GitHub Actions workflow ``init`` drops into a mod repo, pinned to this release."""
-    from . import __version__
+    """The GitHub Actions workflow ``init`` drops into a mod repo.
+
+    It pins the *series* (``@v0.4``), a tag this repository moves to every
+    patch release, so fixes arrive without an edit and the config keeps working.
+    """
+    from . import SERIES
 
     return (WORKFLOW_SCAFFOLD.read_text(encoding="utf-8")
             .replace("{action_repo}", ACTION_REPO)
-            .replace("{version}", __version__))
+            .replace("{series}", SERIES))
 
 
 def cmd_sections(args: argparse.Namespace) -> int:

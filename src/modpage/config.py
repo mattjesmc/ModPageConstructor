@@ -509,6 +509,45 @@ def _build_sections(raw: dict[str, Any], root: Path, assets_dir: str, banner_dir
     return sections
 
 
+def _series_key(series: str) -> tuple[int, int]:
+    parts = series.split(".")
+    if len(parts) != 2 or not all(part.isdigit() for part in parts):
+        raise ValueError(series)
+    return int(parts[0]), int(parts[1])
+
+
+def check_series(declared: Any, path: Path) -> str | None:
+    """Compare the config's ``modpage:`` series with the running tool's.
+
+    A series is ``major.minor``. Patch releases within a series never change
+    what the config means, so ``0.4`` reads identically under 0.4.1 and 0.4.9.
+    A config written for a *newer* series is an error: this tool may not know
+    its keys. One written for an *older* series still loads, with a warning,
+    since the new series may have changed a key's meaning.
+    """
+    if declared is None:
+        return None
+    from . import SERIES, __version__
+
+    text = str(declared).strip()
+    try:
+        wanted, running = _series_key(text), _series_key(SERIES)
+    except ValueError:
+        raise ConfigError(
+            f"{path}: 'modpage' must be a series like \"0.4\" (quoted), got {declared!r}"
+        ) from None
+    if wanted > running:
+        raise ConfigError(
+            f"{path} is written for modpage {text}, but this is modpage {__version__}. "
+            f"Update the pin (uses: ...@v{text}, or pip install ...@v{text})."
+        )
+    if wanted < running:
+        return (f"modpage.yml declares series {text}; this is {__version__}. Series "
+                f"{SERIES} may read some keys differently -- check the changelog, "
+                f"then set 'modpage: \"{SERIES}\"'.")
+    return None
+
+
 def load(path: Path, *, run_generators: bool = True) -> Config:
     """Read one ``modpage.yml``; ``run_generators=False`` leaves references empty."""
     if not path.is_file():
@@ -521,6 +560,7 @@ def load(path: Path, *, run_generators: bool = True) -> Config:
     name = raw.get("name")
     if not name:
         raise ConfigError(f"{path} is missing the required 'name' field")
+    series_warning = check_series(raw.get("modpage"), path)
     slug = raw.get("slug") or str(name).lower().replace(" ", "-")
 
     assets = raw.get("assets") or {}
@@ -543,6 +583,8 @@ def load(path: Path, *, run_generators: bool = True) -> Config:
     except generators_mod.GeneratorError as error:
         raise ConfigError(str(error)) from None
     warnings = list(runtime.warnings)
+    if series_warning:
+        warnings.insert(0, series_warning)
 
     links = {str(k): str(v) for k, v in (raw.get("links") or {}).items() if v}
     minecraft = dict(raw.get("minecraft") or {})

@@ -1,9 +1,10 @@
 # Regenerates README.md, dist/modrinth.md and dist/curseforge.md whenever the
 # main branch changes or a release tag is pushed, and commits the result.
 #
-# Written by `modpage init`. The pinned version below is the modpage release the
-# pages are built with; bump it deliberately, since a newer template may change
-# every page.
+# Written by `modpage init`. The pin below is a *series*: v0.4 follows every
+# 0.4.x patch release, all of which read this repo's modpage.yml the same way.
+# Only a new series (v0.5) may change the config format, so bump that on
+# purpose and look at the resulting commit.
 name: Mod pages
 
 on:
@@ -31,7 +32,7 @@ jobs:
           # instead so the regenerated changelog has somewhere to be committed.
           ref: ${{ github.event.repository.default_branch }}
 
-      - uses: {action_repo}@v{version}
+      - uses: {action_repo}@v{series}
         # with:
         #   config: modpage.yml
         #   targets: readme modrinth curseforge

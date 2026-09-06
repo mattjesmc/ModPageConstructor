@@ -23,19 +23,19 @@ your-mod-repo/
 ## Install
 
 There is no PyPI package; the tool installs straight from this repository. Pin
-a release tag so a template change here never rewrites a page you did not ask
-to change:
+a *series* tag: `v0.4` follows every 0.4.x patch release, and every release in
+a series reads `modpage.yml` the same way (see *Versioning*):
 
 ```bash
-python -m pip install "git+https://github.com/mattjesmc/ModPageConstructor@v0.4.1"
+python -m pip install "git+https://github.com/mattjesmc/ModPageConstructor@v0.4"
 ```
 
 Or run it without installing anything, with [uv](https://docs.astral.sh/uv/)
 or `pipx`:
 
 ```bash
-uvx --from "git+https://github.com/mattjesmc/ModPageConstructor@v0.4.1" modpage build
-pipx run --spec "git+https://github.com/mattjesmc/ModPageConstructor@v0.4.1" modpage build
+uvx --from "git+https://github.com/mattjesmc/ModPageConstructor@v0.4" modpage build
+pipx run --spec "git+https://github.com/mattjesmc/ModPageConstructor@v0.4" modpage build
 ```
 
 If `modpage` is not on your PATH afterwards, `python -m modpage <args>` works
@@ -81,7 +81,7 @@ jobs:
         with:
           fetch-depth: 0     # generators read tags and history
           ref: ${{ github.event.repository.default_branch }}
-      - uses: mattjesmc/ModPageConstructor@v0.4.1
+      - uses: mattjesmc/ModPageConstructor@v0.4
 ```
 
 `fetch-depth: 0` matters: a shallow clone has no tags and one commit, so the
@@ -106,10 +106,36 @@ It exposes one output, `changed`, for steps that want to react. Use
 with `actions/cache`, so the first build after a new recipe fetches a handful of
 PNGs and later builds fetch nothing.
 
-Version pinning is the one thing to keep an eye on. The `@v0.4.1` in `uses:` is
-the generator version the pages are built with, and `init` writes whichever
-version wrote the scaffold. Bump it on purpose, then look at the resulting
-commit.
+The `@v0.4` in `uses:` is a series tag, so patch releases reach the workflow
+without an edit. Moving to a new series (`@v0.5`) is the one change to make on
+purpose, with a look at the resulting commit.
+
+## Versioning
+
+Releases are `major.minor.patch`, and the first two numbers are the **series**.
+The rule is short:
+
+- **A patch (`0.4.1` → `0.4.2`) never changes what `modpage.yml` means.** Bug
+  fixes, rendering fixes and new *optional* keys only. A config that built
+  under `0.4.1` builds identically under `0.4.9`.
+- **Only a new series (`0.4` → `0.5`) may change the config format**, and the
+  changelog says what moved.
+
+So a mod repo pins the series, not the patch: `@v0.4` in the workflow and in
+the `pip install` line. This repository moves the `v0.4` tag to every `0.4.x`
+release, after the example builds clean on it.
+
+`modpage init` writes the series into the config as well:
+
+```yaml
+modpage: "0.4"    # the series this file is written for; keep it quoted
+```
+
+The tool compares that line with itself on every build. Same series: nothing
+to say. An older series: the page still builds, with a warning to read the
+changelog and update the line. A newer series than the running tool: an
+error, since the config may use keys this version does not know, and the fix
+is to move the pin. Configs without the line load as before.
 
 ## The shared skeleton
 
