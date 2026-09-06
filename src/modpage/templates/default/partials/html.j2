@@ -188,6 +188,32 @@
 {#- Generated elements, in the tags CurseForge's sanitiser keeps. No <details>
     here either, so a collapsed section is simply shown in full. -#}
 
+{#- ------------------------------------------------------------------------
+    Typed elements.
+
+    An element carrying `type:` is drawn by a template of its own rather than by the section's
+    `layout:`: `<template>/elements/<type>.html.j2`, looked up on the same loader the partials
+    are, so `.modpage/templates/<template>/elements/<type>.html.j2` in a mod's repository wins
+    over the packaged one. That is the seam a repo has for saying "this is a socket table" or
+    "this is a piece card" without the shared skeleton having to know what either is - the same
+    shape the generator registry already has for the data half.
+
+    A type with no template renders as nothing rather than as an error: a page that is missing
+    one block is a better answer than a build that stops, and the warning belongs to whoever
+    wrote the type. `raw` is packaged, and is the escape hatch the layouts never had.
+    ------------------------------------------------------------------------ -#}
+{%- macro has_types(items) -%}
+{{ 'yes' if (items or []) | selectattr('type', 'defined') | selectattr('type') | list else '' }}
+{%- endmacro -%}
+
+{% macro typed(items) %}
+{% for item in items or [] %}
+{% if item.type %}
+{% include [cfg.template ~ '/elements/' ~ item.type ~ '.html.j2'] ignore missing %}
+{% endif %}
+{% endfor %}
+{% endmacro %}
+
 {%- macro element_title(item) -%}
 {% if item.url %}<a href="{{ item.url }}">{{ item.title | e }}</a>{% else %}{{ item.title | e }}{% endif %}
 {%- endmacro -%}
@@ -264,7 +290,9 @@
 {% endmacro %}
 
 {% macro elements(section) %}
-{% if section.layout == 'table' %}
+{% if has_types(section.data['elements']) %}
+{{ typed(section.data['elements']) }}
+{% elif section.layout == 'table' %}
 {{ elements_table(section) }}
 {% elif section.layout == 'changelog' %}
 {% for release in section.data['elements'] %}

@@ -1,0 +1,46 @@
+# A DOCUMENT: a second page, rendered by the same build as the mod page.
+#
+# It is an ordinary config - the same sections, the same generators, the same targets - and the
+# only thing modpage.yml says about it is which file it is and where its output goes. That is what
+# lets a wiki page be part prose and part generated without the page templates learning what a
+# wiki is.
+name: Lantern Lights — Lighting
+slug: lantern-lights
+tagline: How the light follows the lantern, and what it costs.
+
+assets:
+  dir: assets
+
+# The document has its own generators, over the same repository.
+generators:
+  versions:
+    use: config.versions
+
+minecraft:
+  versions: ["1.21.1", "1.20.1"]
+  loaders: ["Fabric", "NeoForge"]
+
+toc: false
+
+sections:
+  about: |
+    The vanilla light engine stores light per block, not per entity. Lantern Lights writes a
+    light value into the block the lantern is attached to and clears it when the lantern moves,
+    which is why the light follows without a tick of lag and without a light-emitting entity.
+
+  faq:
+    items:
+      - q: Does it cost anything at range?
+        a: No. A lantern out of view is not lit, because nothing is asking.
+      - q: Does it work on a server?
+        a: Yes; the light is written server-side and travels in the ordinary chunk update.
+
+custom_sections:
+  - id: support
+    title: Where it works
+    after: about
+    layout: table
+    columns:
+      - {field: version, title: Minecraft}
+      - {field: description, title: Loaders}
+    elements: {from: versions}

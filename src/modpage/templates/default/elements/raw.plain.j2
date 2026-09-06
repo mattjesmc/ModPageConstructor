@@ -1,0 +1,3 @@
+{#- `type: raw` where no HTML survives (CurseForge's Markdown mode escapes it): the body alone,
+    and never the `html:` half. See elements/raw.md.j2. -#}
+{{ item.body or item.text or '' }}

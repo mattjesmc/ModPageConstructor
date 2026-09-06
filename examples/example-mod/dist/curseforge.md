@@ -14,6 +14,7 @@
 
 - About
 - Supported versions
+- A note from the author
 - Features
 - Gallery
 - Recipes
@@ -43,6 +44,13 @@ It is a drop-in change: no new items, no world data, nothing to migrate.
 | --- | --- |
 | 1.21.1 | Fabric, NeoForge |
 | 1.20.1 | Fabric, NeoForge |
+
+---
+
+## A note from the author
+
+Lantern Lights is a **weekend mod**. It does one thing, it will keep doing that
+one thing, and it will not grow a config screen.
 
 ---
 

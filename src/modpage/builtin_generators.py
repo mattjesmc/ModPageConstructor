@@ -357,6 +357,91 @@ def files_glob(ctx: Context) -> list[dict[str, Any]]:
     return elements
 
 
+# ---------------------------------------------------------------------------
+# Minecraft: the language file
+# ---------------------------------------------------------------------------
+
+#: Where a mod keeps its translations. Both layouts a Minecraft mod uses, in the order the game
+#: looks: a resource pack rooted at the repository, and a Gradle source set.
+LANG_ROOTS = ("assets", "src/main/resources/assets")
+
+
+def _lang_files(ctx: Context, namespace: str | None, code: str) -> list[Path]:
+    """Every ``assets/<ns>/lang/<code>.json`` in the repository, or one namespace's."""
+    out: list[Path] = []
+    for root in LANG_ROOTS:
+        base = ctx.root / root
+        if not base.is_dir():
+            continue
+        for path in sorted(base.glob(f"{namespace or '*'}/lang/{code}.json")):
+            if path.is_file():
+                out.append(path)
+    return out
+
+
+def _lang_map(ctx: Context, namespace: str | None = None, code: str = "en_us") -> dict[str, str]:
+    """The translations, merged, first file winning - which is the game's own rule."""
+    merged: dict[str, str] = {}
+    for path in _lang_files(ctx, namespace, code):
+        loaded = ctx.load_data(path.relative_to(ctx.root).as_posix())
+        if isinstance(loaded, dict):
+            for key, value in loaded.items():
+                merged.setdefault(str(key), str(value))
+    return merged
+
+
+def _parse_lang_key(key: str) -> dict[str, str]:
+    """What a translation key says about the thing it names.
+
+    Minecraft keys read ``<kind>.<namespace>.<path>`` - ``item.minecraft.diamond``,
+    ``decoration.armorpieces.circlet``, ``block.mymod.lamp.tooltip``. The first two segments are
+    the kind and the namespace; everything after is the path, and the id is the namespace and the
+    path joined with a colon, which is what every other file in a mod calls the same thing."""
+    parts = key.split(".")
+    if len(parts) < 3:
+        return {"kind": parts[0] if parts else "", "namespace": "", "path": "", "id": ""}
+    kind, namespace = parts[0], parts[1]
+    path = ".".join(parts[2:])
+    return {"kind": kind, "namespace": namespace, "path": path,
+            "id": f"{namespace}:{path.replace('.', '/')}" if path else ""}
+
+
+@generator("mc.lang")
+def mc_lang(ctx: Context) -> list[dict[str, Any]]:
+    """Every line of a mod's language file, with the id each key names.
+
+    Options: ``namespace`` (one namespace rather than every one in the repo), ``code`` (the
+    language, default ``en_us``), ``kind`` (only keys of this kind - ``item``, ``block``,
+    whatever a mod invented), ``prefix`` (only keys starting with this).
+
+    Display names are the one thing a mod repository knows and a page cannot guess: prettifying
+    an id gets ``Great Helm`` right and ``TNT`` wrong, and it never gets a name that is not the
+    id at all. This reads what the game reads.
+    """
+    namespace = ctx.opt("namespace")
+    code = str(ctx.opt("code", "en_us"))
+    kind = ctx.opt("kind")
+    prefix = ctx.opt("prefix")
+
+    lines = _lang_map(ctx, str(namespace) if namespace else None, code)
+    if not lines:
+        ctx.warn(f"no {code}.json under " + " or ".join(f"{root}/<ns>/lang" for root in LANG_ROOTS))
+        return []
+
+    elements: list[dict[str, Any]] = []
+    for key, value in sorted(lines.items()):
+        if prefix and not key.startswith(str(prefix)):
+            continue
+        parsed = _parse_lang_key(key)
+        if kind and parsed["kind"] != str(kind):
+            continue
+        elements.append({"key": key, "value": value, "title": value, "name": value,
+                         "description": "", **parsed})
+    if not elements:
+        ctx.warn(f"{len(lines)} lines in {code}.json, none matching")
+    return elements
+
+
 @generator("data.file")
 def data_file(ctx: Context) -> list[dict[str, Any]]:
     """Elements read out of JSON or YAML in the repo (``fabric.mod.json``, a data pack…).
@@ -366,11 +451,22 @@ def data_file(ctx: Context) -> list[dict[str, Any]]:
     (field name to store a mapping's key under, default ``id``), ``each``
     (force one element per key -- a mapping of id to a version string is a list
     of dependencies, while a mod manifest is one object, and only you know
-    which you have).
+    which you have), ``lang`` (resolve display names through the mod's language
+    file: see below).
+
+    ``lang:`` takes a dotted path to the translation key inside each element --
+    ``description.translate`` for a data-driven registry entry, or ``true`` for
+    the common shape where the element's own ``translate`` field holds it. The
+    line it names becomes the element's ``title`` and ``name``, so a generated
+    list says what the game says rather than a prettified id. A key with no
+    translation leaves the element as it was, which is what the game does too.
     """
     key_field = str(ctx.opt("key", "id"))
     pluck = ctx.opt("pluck")
     each = ctx.opt("each")
+    lang_at = ctx.opt("lang")
+    lines = _lang_map(ctx, str(ctx.opt("namespace")) if ctx.opt("namespace") else None,
+                      str(ctx.opt("code", "en_us"))) if lang_at else {}
 
     documents: list[tuple[Path | None, Any]] = []
     if ctx.opt("path"):
@@ -421,7 +517,26 @@ def data_file(ctx: Context) -> list[dict[str, Any]]:
                 elements.append({**node, "file": stem, key_field: node.get(key_field, stem)})
         else:
             elements.append({"value": node, "title": str(node), "file": stem})
+
+    if lang_at:
+        path_parts = None if lang_at is True else str(lang_at).split(".")
+        for element in elements:
+            key = element.get("translate") if path_parts is None else _dig(element, path_parts)
+            line = lines.get(str(key)) if isinstance(key, str) else None
+            if line:
+                element["title"] = line
+                element["name"] = line
+                element["translate"] = key
     return elements
+
+
+def _dig(node: Any, parts: list[str]) -> Any:
+    """One dotted path into a nested mapping, or None."""
+    for part in parts:
+        if not isinstance(node, dict):
+            return None
+        node = node.get(part)
+    return node
 
 
 @generator("changelog.file")

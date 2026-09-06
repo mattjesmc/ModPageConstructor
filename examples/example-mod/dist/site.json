@@ -1,0 +1,1488 @@
+{
+  "badges": [
+    {
+      "alt": "Modrinth",
+      "image": "https://img.shields.io/modrinth/dt/lantern-lights?style=for-the-badge&logo=modrinth&logoColor=white&label=Modrinth&color=00AF5C",
+      "url": "https://modrinth.com/mod/lantern-lights"
+    },
+    {
+      "alt": "CurseForge",
+      "image": "https://img.shields.io/badge/CurseForge-Download-F16436?style=for-the-badge&logo=curseforge&logoColor=white",
+      "url": "https://www.curseforge.com/minecraft/mc-mods/lantern-lights"
+    },
+    {
+      "alt": "GitHub release",
+      "image": "https://img.shields.io/github/v/release/Matthijs/lantern-lights?style=for-the-badge&logo=github&logoColor=white&label=Release&color=5b21b6",
+      "url": "https://github.com/Matthijs/lantern-lights/releases/latest"
+    },
+    {
+      "alt": "Loaders",
+      "image": "https://img.shields.io/badge/Loader-Fabric_|_NeoForge-5b21b6?style=for-the-badge",
+      "url": "https://modrinth.com/mod/lantern-lights"
+    },
+    {
+      "alt": "Minecraft versions",
+      "image": "https://img.shields.io/badge/Minecraft-1.21.1_|_1.20.1-5b21b6?style=for-the-badge",
+      "url": "https://modrinth.com/mod/lantern-lights"
+    },
+    {
+      "alt": "License",
+      "image": "https://img.shields.io/badge/License-MIT-5b21b6?style=for-the-badge",
+      "url": ""
+    }
+  ],
+  "extra": {},
+  "gen": {
+    "releases": [
+      {
+        "body": "",
+        "changes": [
+          {
+            "group": "Added",
+            "subject": "Copper lanterns, and a recipe to cut them from blocks",
+            "title": "Copper lanterns, and a recipe to cut them from blocks",
+            "type": "added",
+            "url": ""
+          },
+          {
+            "group": "Added",
+            "subject": "`radius` is now per-dimension",
+            "title": "`radius` is now per-dimension",
+            "type": "added",
+            "url": ""
+          },
+          {
+            "group": "Fixed",
+            "subject": "Lanterns held in the offhand no longer flicker at chunk borders",
+            "title": "Lanterns held in the offhand no longer flicker at chunk borders",
+            "type": "fixed",
+            "url": ""
+          }
+        ],
+        "count": 3,
+        "date": "2026-08-14",
+        "datetime": "2026-08-14",
+        "groups": [
+          {
+            "items": [
+              {
+                "group": "Added",
+                "subject": "Copper lanterns, and a recipe to cut them from blocks",
+                "title": "Copper lanterns, and a recipe to cut them from blocks",
+                "type": "added",
+                "url": ""
+              },
+              {
+                "group": "Added",
+                "subject": "`radius` is now per-dimension",
+                "title": "`radius` is now per-dimension",
+                "type": "added",
+                "url": ""
+              }
+            ],
+            "key": "added",
+            "title": "Added"
+          },
+          {
+            "items": [
+              {
+                "group": "Fixed",
+                "subject": "Lanterns held in the offhand no longer flicker at chunk borders",
+                "title": "Lanterns held in the offhand no longer flicker at chunk borders",
+                "type": "fixed",
+                "url": ""
+              }
+            ],
+            "key": "fixed",
+            "title": "Fixed"
+          }
+        ],
+        "prerelease": false,
+        "subject": "",
+        "tag": "1.2.0",
+        "title": "1.2.0",
+        "unreleased": false,
+        "url": "",
+        "version": "1.2.0"
+      },
+      {
+        "body": "",
+        "changes": [
+          {
+            "group": "Added",
+            "subject": "Glow lanterns craft from any plank",
+            "title": "Glow lanterns craft from any plank",
+            "type": "added",
+            "url": ""
+          },
+          {
+            "group": "Changed",
+            "subject": "Rewrote the light propagation loop; roughly 4x faster on large caves",
+            "title": "Rewrote the light propagation loop; roughly 4x faster on large caves",
+            "type": "changed",
+            "url": ""
+          }
+        ],
+        "count": 2,
+        "date": "2026-06-02",
+        "datetime": "2026-06-02",
+        "groups": [
+          {
+            "items": [
+              {
+                "group": "Added",
+                "subject": "Glow lanterns craft from any plank",
+                "title": "Glow lanterns craft from any plank",
+                "type": "added",
+                "url": ""
+              }
+            ],
+            "key": "added",
+            "title": "Added"
+          },
+          {
+            "items": [
+              {
+                "group": "Changed",
+                "subject": "Rewrote the light propagation loop; roughly 4x faster on large caves",
+                "title": "Rewrote the light propagation loop; roughly 4x faster on large caves",
+                "type": "changed",
+                "url": ""
+              }
+            ],
+            "key": "changed",
+            "title": "Changed"
+          }
+        ],
+        "prerelease": false,
+        "subject": "",
+        "tag": "1.1.0",
+        "title": "1.1.0",
+        "unreleased": false,
+        "url": "",
+        "version": "1.1.0"
+      },
+      {
+        "body": "",
+        "changes": [
+          {
+            "group": "Added",
+            "subject": "First release",
+            "title": "First release",
+            "type": "added",
+            "url": ""
+          }
+        ],
+        "count": 1,
+        "date": "2026-04-20",
+        "datetime": "2026-04-20",
+        "groups": [
+          {
+            "items": [
+              {
+                "group": "Added",
+                "subject": "First release",
+                "title": "First release",
+                "type": "added",
+                "url": ""
+              }
+            ],
+            "key": "added",
+            "title": "Added"
+          }
+        ],
+        "prerelease": false,
+        "subject": "",
+        "tag": "1.0.0",
+        "title": "1.0.0",
+        "unreleased": false,
+        "url": "",
+        "version": "1.0.0"
+      }
+    ],
+    "screenshots": [
+      {
+        "alt": "A lit mineshaft, no torches placed",
+        "caption": "A lit mineshaft, no torches placed",
+        "ext": "png",
+        "image": "gallery/overview.png",
+        "index": 1,
+        "name": "overview.png",
+        "path": "assets/gallery/overview.png",
+        "size": 5023,
+        "src": "gallery/overview.png",
+        "stem": "overview",
+        "title": "A lit mineshaft, no torches placed"
+      }
+    ],
+    "support": [
+      {
+        "description": "Fabric, NeoForge",
+        "loaders": [
+          "Fabric",
+          "NeoForge"
+        ],
+        "title": "1.21.1",
+        "version": "1.21.1"
+      },
+      {
+        "description": "Fabric, NeoForge",
+        "loaders": [
+          "Fabric",
+          "NeoForge"
+        ],
+        "title": "1.20.1",
+        "version": "1.20.1"
+      }
+    ]
+  },
+  "header": {
+    "align": "center",
+    "banner": "banners/header.png",
+    "heading_with_banner": false,
+    "section_banner_width": 480,
+    "show_title": false,
+    "width": 720
+  },
+  "is_html": false,
+  "links": {
+    "curseforge": "https://www.curseforge.com/minecraft/mc-mods/lantern-lights",
+    "github": "https://github.com/Matthijs/lantern-lights",
+    "issues": "https://github.com/Matthijs/lantern-lights/issues",
+    "modrinth": "https://modrinth.com/mod/lantern-lights"
+  },
+  "minecraft": {
+    "environment": "Client & Server",
+    "loaders": [
+      "Fabric",
+      "NeoForge"
+    ],
+    "versions": [
+      "1.21.1",
+      "1.20.1"
+    ]
+  },
+  "platform": "site",
+  "raw": {
+    "assets": {
+      "base_url": "https://raw.githubusercontent.com/Matthijs/lantern-lights/main/",
+      "dir": "assets"
+    },
+    "authors": [
+      "Matthijs"
+    ],
+    "badges": {
+      "color": "5b21b6",
+      "style": "for-the-badge"
+    },
+    "custom_sections": [
+      {
+        "after": "about",
+        "columns": [
+          {
+            "field": "version",
+            "title": "Minecraft"
+          },
+          {
+            "field": "description",
+            "title": "Loaders"
+          }
+        ],
+        "elements": [
+          {
+            "description": "Fabric, NeoForge",
+            "loaders": [
+              "Fabric",
+              "NeoForge"
+            ],
+            "title": "1.21.1",
+            "version": "1.21.1"
+          },
+          {
+            "description": "Fabric, NeoForge",
+            "loaders": [
+              "Fabric",
+              "NeoForge"
+            ],
+            "title": "1.20.1",
+            "version": "1.20.1"
+          }
+        ],
+        "id": "support",
+        "layout": "table",
+        "title": "Supported versions"
+      },
+      {
+        "after": "support",
+        "elements": [
+          {
+            "body": "Lantern Lights is a **weekend mod**. It does one thing, it will keep doing that\none thing, and it will not grow a config screen.\n",
+            "html": "<p><em>Lantern Lights</em> is a <b>weekend mod</b>. It does one thing, it will keep\ndoing that one thing, and it will not grow a config screen.</p>\n",
+            "type": "raw"
+          }
+        ],
+        "id": "notes",
+        "title": "A note from the author"
+      }
+    ],
+    "documents": [
+      {
+        "config": "docs/wiki.yml",
+        "id": "lighting",
+        "out": "dist/wiki/{target}/lighting.{ext}"
+      }
+    ],
+    "footer": "Issues and pull requests are welcome.",
+    "generators": {
+      "releases": {
+        "limit": 3,
+        "use": "changelog.file"
+      },
+      "screenshots": {
+        "captions": {
+          "overview": "A lit mineshaft, no torches placed"
+        },
+        "pattern": "gallery/*.png",
+        "use": "files.glob"
+      },
+      "support": {
+        "use": "config.versions"
+      }
+    },
+    "header": {
+      "section_banner_width": 480,
+      "width": 720
+    },
+    "license": "MIT",
+    "links": {
+      "curseforge": "https://www.curseforge.com/minecraft/mc-mods/lantern-lights",
+      "github": "https://github.com/Matthijs/lantern-lights",
+      "issues": "https://github.com/Matthijs/lantern-lights/issues",
+      "modrinth": "https://modrinth.com/mod/lantern-lights"
+    },
+    "minecraft": {
+      "environment": "Client & Server",
+      "loaders": [
+        "Fabric",
+        "NeoForge"
+      ],
+      "versions": [
+        "1.21.1",
+        "1.20.1"
+      ]
+    },
+    "modpage": "0.4",
+    "name": "Lantern Lights",
+    "sections": {
+      "about": "Lantern Lights replaces the vanilla lantern with a dynamic light source that\nfollows the block it is attached to, so corridors, mineshafts and boats stay\nlit without a single command block.\n\nIt is a drop-in change: no new items, no world data, nothing to migrate.\n",
+      "changelog": {
+        "body": "Generated from `CHANGELOG.md` at build time -- write the entry once, and\nall three pages carry it.\n",
+        "collapsed": true,
+        "elements": [
+          {
+            "body": "",
+            "changes": [
+              {
+                "group": "Added",
+                "subject": "Copper lanterns, and a recipe to cut them from blocks",
+                "title": "Copper lanterns, and a recipe to cut them from blocks",
+                "type": "added",
+                "url": ""
+              },
+              {
+                "group": "Added",
+                "subject": "`radius` is now per-dimension",
+                "title": "`radius` is now per-dimension",
+                "type": "added",
+                "url": ""
+              },
+              {
+                "group": "Fixed",
+                "subject": "Lanterns held in the offhand no longer flicker at chunk borders",
+                "title": "Lanterns held in the offhand no longer flicker at chunk borders",
+                "type": "fixed",
+                "url": ""
+              }
+            ],
+            "count": 3,
+            "date": "2026-08-14",
+            "datetime": "2026-08-14",
+            "groups": [
+              {
+                "items": [
+                  {
+                    "group": "Added",
+                    "subject": "Copper lanterns, and a recipe to cut them from blocks",
+                    "title": "Copper lanterns, and a recipe to cut them from blocks",
+                    "type": "added",
+                    "url": ""
+                  },
+                  {
+                    "group": "Added",
+                    "subject": "`radius` is now per-dimension",
+                    "title": "`radius` is now per-dimension",
+                    "type": "added",
+                    "url": ""
+                  }
+                ],
+                "key": "added",
+                "title": "Added"
+              },
+              {
+                "items": [
+                  {
+                    "group": "Fixed",
+                    "subject": "Lanterns held in the offhand no longer flicker at chunk borders",
+                    "title": "Lanterns held in the offhand no longer flicker at chunk borders",
+                    "type": "fixed",
+                    "url": ""
+                  }
+                ],
+                "key": "fixed",
+                "title": "Fixed"
+              }
+            ],
+            "prerelease": false,
+            "subject": "",
+            "tag": "1.2.0",
+            "title": "1.2.0",
+            "unreleased": false,
+            "url": "",
+            "version": "1.2.0"
+          },
+          {
+            "body": "",
+            "changes": [
+              {
+                "group": "Added",
+                "subject": "Glow lanterns craft from any plank",
+                "title": "Glow lanterns craft from any plank",
+                "type": "added",
+                "url": ""
+              },
+              {
+                "group": "Changed",
+                "subject": "Rewrote the light propagation loop; roughly 4x faster on large caves",
+                "title": "Rewrote the light propagation loop; roughly 4x faster on large caves",
+                "type": "changed",
+                "url": ""
+              }
+            ],
+            "count": 2,
+            "date": "2026-06-02",
+            "datetime": "2026-06-02",
+            "groups": [
+              {
+                "items": [
+                  {
+                    "group": "Added",
+                    "subject": "Glow lanterns craft from any plank",
+                    "title": "Glow lanterns craft from any plank",
+                    "type": "added",
+                    "url": ""
+                  }
+                ],
+                "key": "added",
+                "title": "Added"
+              },
+              {
+                "items": [
+                  {
+                    "group": "Changed",
+                    "subject": "Rewrote the light propagation loop; roughly 4x faster on large caves",
+                    "title": "Rewrote the light propagation loop; roughly 4x faster on large caves",
+                    "type": "changed",
+                    "url": ""
+                  }
+                ],
+                "key": "changed",
+                "title": "Changed"
+              }
+            ],
+            "prerelease": false,
+            "subject": "",
+            "tag": "1.1.0",
+            "title": "1.1.0",
+            "unreleased": false,
+            "url": "",
+            "version": "1.1.0"
+          },
+          {
+            "body": "",
+            "changes": [
+              {
+                "group": "Added",
+                "subject": "First release",
+                "title": "First release",
+                "type": "added",
+                "url": ""
+              }
+            ],
+            "count": 1,
+            "date": "2026-04-20",
+            "datetime": "2026-04-20",
+            "groups": [
+              {
+                "items": [
+                  {
+                    "group": "Added",
+                    "subject": "First release",
+                    "title": "First release",
+                    "type": "added",
+                    "url": ""
+                  }
+                ],
+                "key": "added",
+                "title": "Added"
+              }
+            ],
+            "prerelease": false,
+            "subject": "",
+            "tag": "1.0.0",
+            "title": "1.0.0",
+            "unreleased": false,
+            "url": "",
+            "version": "1.0.0"
+          }
+        ],
+        "summary": "What changed in the last three releases"
+      },
+      "configuration": "The config lives at `config/lantern-lights.json`:\n\n| Key | Default | Meaning |\n| --- | --- | --- |\n| `radius` | `12` | Light radius in blocks |\n| `smooth` | `true` | Fade light in and out |\n",
+      "credits": "Textures by **@someone**. Thanks to the Fabric community for the light engine notes.\n",
+      "dependencies": {
+        "optional": [
+          {
+            "name": "Mod Menu",
+            "note": "In-game config screen",
+            "url": "https://modrinth.com/mod/modmenu"
+          }
+        ],
+        "required": [
+          {
+            "name": "Fabric API",
+            "note": "Fabric builds only",
+            "url": "https://modrinth.com/mod/fabric-api",
+            "version": ">=0.100.0"
+          }
+        ]
+      },
+      "faq": {
+        "items": [
+          {
+            "a": "Yes. Install it on both sides for the full effect.",
+            "q": "Does it work on a server?"
+          },
+          {
+            "a": "No, it uses the vanilla light engine.",
+            "q": "Does it break shaders?"
+          }
+        ]
+      },
+      "features": {
+        "items": [
+          {
+            "description": "Lanterns emit light along the path they are carried.",
+            "title": "Dynamic lighting"
+          },
+          {
+            "description": "Sensible defaults out of the box; every value is tunable.",
+            "title": "Zero config required"
+          },
+          "Server-side friendly, with client-only rendering"
+        ]
+      },
+      "gallery": {
+        "images": [
+          {
+            "alt": "A lit mineshaft, no torches placed",
+            "caption": "A lit mineshaft, no torches placed",
+            "ext": "png",
+            "image": "gallery/overview.png",
+            "index": 1,
+            "name": "overview.png",
+            "path": "assets/gallery/overview.png",
+            "size": 5023,
+            "src": "gallery/overview.png",
+            "stem": "overview",
+            "title": "A lit mineshaft, no torches placed"
+          }
+        ]
+      },
+      "incompatibilities": {
+        "known": [
+          {
+            "name": "Shimmer",
+            "reason": "Both patch the light engine",
+            "url": "https://modrinth.com/mod/shimmer",
+            "workaround": "Disable Shimmer's dynamic lights"
+          }
+        ]
+      },
+      "installation": "1. Install [Fabric Loader](https://fabricmc.net/use/) or NeoForge.\n2. Drop `lantern-lights.jar` (and Fabric API on Fabric) into `mods/`.\n3. Launch the game.\n",
+      "recipes": {
+        "body": "Every recipe below is generated straight from the mod's data files.\n",
+        "columns": 3,
+        "scale": 3,
+        "summary": "Show all recipes"
+      }
+    },
+    "slug": "lantern-lights",
+    "tagline": "Hand-placed lanterns that actually light the world.",
+    "toc": {
+      "skip": [
+        "license"
+      ],
+      "style": "list",
+      "title": "Contents"
+    }
+  },
+  "sections": [
+    {
+      "banner": "banners/about.png",
+      "body": "Lantern Lights replaces the vanilla lantern with a dynamic light source that\nfollows the block it is attached to, so corridors, mineshafts and boats stay\nlit without a single command block.\n\nIt is a drop-in change: no new items, no world data, nothing to migrate.",
+      "data": {},
+      "empty_text": null,
+      "id": "about",
+      "layout": "list",
+      "options": {},
+      "targets": null,
+      "title": "About"
+    },
+    {
+      "banner": "banners/support.png",
+      "body": null,
+      "data": {
+        "columns": [
+          {
+            "field": "version",
+            "title": "Minecraft"
+          },
+          {
+            "field": "description",
+            "title": "Loaders"
+          }
+        ],
+        "elements": [
+          {
+            "description": "Fabric, NeoForge",
+            "loaders": [
+              "Fabric",
+              "NeoForge"
+            ],
+            "title": "1.21.1",
+            "version": "1.21.1"
+          },
+          {
+            "description": "Fabric, NeoForge",
+            "loaders": [
+              "Fabric",
+              "NeoForge"
+            ],
+            "title": "1.20.1",
+            "version": "1.20.1"
+          }
+        ]
+      },
+      "empty_text": null,
+      "id": "support",
+      "layout": "table",
+      "options": {
+        "columns": [
+          {
+            "field": "version",
+            "title": "Minecraft"
+          },
+          {
+            "field": "description",
+            "title": "Loaders"
+          }
+        ]
+      },
+      "targets": null,
+      "title": "Supported versions"
+    },
+    {
+      "banner": null,
+      "body": null,
+      "data": {
+        "elements": [
+          {
+            "body": "Lantern Lights is a **weekend mod**. It does one thing, it will keep doing that\none thing, and it will not grow a config screen.\n",
+            "description": "Lantern Lights is a **weekend mod**. It does one thing, it will keep doing that\none thing, and it will not grow a config screen.\n",
+            "html": "<p><em>Lantern Lights</em> is a <b>weekend mod</b>. It does one thing, it will keep\ndoing that one thing, and it will not grow a config screen.</p>\n",
+            "title": null,
+            "type": "raw"
+          }
+        ]
+      },
+      "empty_text": null,
+      "id": "notes",
+      "layout": "list",
+      "options": {},
+      "targets": null,
+      "title": "A note from the author"
+    },
+    {
+      "banner": "banners/features.png",
+      "body": null,
+      "data": {
+        "items": [
+          {
+            "description": "Lanterns emit light along the path they are carried.",
+            "title": "Dynamic lighting"
+          },
+          {
+            "description": "Sensible defaults out of the box; every value is tunable.",
+            "title": "Zero config required"
+          },
+          {
+            "description": null,
+            "title": "Server-side friendly, with client-only rendering"
+          }
+        ]
+      },
+      "empty_text": null,
+      "id": "features",
+      "layout": "list",
+      "options": {},
+      "targets": null,
+      "title": "Features"
+    },
+    {
+      "banner": "banners/gallery.png",
+      "body": null,
+      "data": {
+        "images": [
+          {
+            "alt": "A lit mineshaft, no torches placed",
+            "caption": "A lit mineshaft, no torches placed",
+            "ext": "png",
+            "image": "gallery/overview.png",
+            "index": 1,
+            "name": "overview.png",
+            "path": "assets/gallery/overview.png",
+            "size": 5023,
+            "src": "gallery/overview.png",
+            "stem": "overview",
+            "title": "A lit mineshaft, no torches placed"
+          }
+        ]
+      },
+      "empty_text": null,
+      "id": "gallery",
+      "layout": "gallery",
+      "options": {},
+      "targets": null,
+      "title": "Gallery"
+    },
+    {
+      "banner": "banners/recipes.png",
+      "body": "Every recipe below is generated straight from the mod's data files.",
+      "data": {
+        "images": [
+          {
+            "animated": false,
+            "frames": 1,
+            "path": "C:\\Users\\Matthijs\\ModPageConstructor\\examples\\example-mod\\assets\\recipes\\lantern_lights__glow_ingot_from_smelting.png",
+            "recipe": {
+              "grid": [],
+              "id": "lantern_lights:glow_ingot_from_smelting",
+              "inputs": [
+                {
+                  "candidates": [
+                    "lantern_lights:raw_glow"
+                  ],
+                  "count": 1,
+                  "is_tag": false,
+                  "label": "Raw Glow"
+                }
+              ],
+              "label": "Glow Ingot From Smelting",
+              "result": {
+                "candidates": [
+                  "lantern_lights:glow_ingot"
+                ],
+                "count": 1,
+                "is_tag": false,
+                "label": "Glow Ingot"
+              },
+              "result_count": 1,
+              "shapeless": false,
+              "source": "C:\\Users\\Matthijs\\ModPageConstructor\\examples\\example-mod\\src\\main\\resources\\data\\lantern_lights\\recipe\\glow_ingot_from_smelting.json",
+              "type": "minecraft:smelting"
+            },
+            "relative": "recipes/lantern_lights__glow_ingot_from_smelting.png"
+          },
+          {
+            "animated": true,
+            "frames": 8,
+            "path": "C:\\Users\\Matthijs\\ModPageConstructor\\examples\\example-mod\\assets\\recipes\\lantern_lights__glow_lantern_from_planks.gif",
+            "recipe": {
+              "grid": [
+                [
+                  {
+                    "candidates": [
+                      "minecraft:oak_planks",
+                      "minecraft:spruce_planks",
+                      "minecraft:birch_planks",
+                      "minecraft:jungle_planks",
+                      "minecraft:acacia_planks",
+                      "minecraft:dark_oak_planks",
+                      "minecraft:pale_oak_planks",
+                      "minecraft:crimson_planks"
+                    ],
+                    "count": 1,
+                    "is_tag": true,
+                    "label": "Planks"
+                  },
+                  {
+                    "candidates": [
+                      "minecraft:oak_planks",
+                      "minecraft:spruce_planks",
+                      "minecraft:birch_planks",
+                      "minecraft:jungle_planks",
+                      "minecraft:acacia_planks",
+                      "minecraft:dark_oak_planks",
+                      "minecraft:pale_oak_planks",
+                      "minecraft:crimson_planks"
+                    ],
+                    "count": 1,
+                    "is_tag": true,
+                    "label": "Planks"
+                  }
+                ],
+                [
+                  {
+                    "candidates": [
+                      "minecraft:oak_planks",
+                      "minecraft:spruce_planks",
+                      "minecraft:birch_planks",
+                      "minecraft:jungle_planks",
+                      "minecraft:acacia_planks",
+                      "minecraft:dark_oak_planks",
+                      "minecraft:pale_oak_planks",
+                      "minecraft:crimson_planks"
+                    ],
+                    "count": 1,
+                    "is_tag": true,
+                    "label": "Planks"
+                  },
+                  {
+                    "candidates": [
+                      "lantern_lights:glow_ingot"
+                    ],
+                    "count": 1,
+                    "is_tag": false,
+                    "label": "Glow Ingot"
+                  }
+                ]
+              ],
+              "id": "lantern_lights:glow_lantern_from_planks",
+              "inputs": [],
+              "label": "Glow Lantern From Planks",
+              "result": {
+                "candidates": [
+                  "lantern_lights:lantern_block"
+                ],
+                "count": 1,
+                "is_tag": false,
+                "label": "Lantern Block"
+              },
+              "result_count": 2,
+              "shapeless": false,
+              "source": "C:\\Users\\Matthijs\\ModPageConstructor\\examples\\example-mod\\src\\main\\resources\\data\\lantern_lights\\recipe\\glow_lantern_from_planks.json",
+              "type": "minecraft:crafting_shaped"
+            },
+            "relative": "recipes/lantern_lights__glow_lantern_from_planks.gif"
+          },
+          {
+            "animated": false,
+            "frames": 1,
+            "path": "C:\\Users\\Matthijs\\ModPageConstructor\\examples\\example-mod\\assets\\recipes\\lantern_lights__lantern.png",
+            "recipe": {
+              "grid": [
+                [
+                  {
+                    "candidates": [
+                      "minecraft:iron_nugget"
+                    ],
+                    "count": 1,
+                    "is_tag": false,
+                    "label": "Iron Nugget"
+                  },
+                  {
+                    "candidates": [
+                      "minecraft:iron_nugget"
+                    ],
+                    "count": 1,
+                    "is_tag": false,
+                    "label": "Iron Nugget"
+                  },
+                  {
+                    "candidates": [
+                      "minecraft:iron_nugget"
+                    ],
+                    "count": 1,
+                    "is_tag": false,
+                    "label": "Iron Nugget"
+                  }
+                ],
+                [
+                  {
+                    "candidates": [
+                      "minecraft:iron_nugget"
+                    ],
+                    "count": 1,
+                    "is_tag": false,
+                    "label": "Iron Nugget"
+                  },
+                  {
+                    "candidates": [
+                      "minecraft:torch"
+                    ],
+                    "count": 1,
+                    "is_tag": false,
+                    "label": "Torch"
+                  },
+                  {
+                    "candidates": [
+                      "minecraft:iron_nugget"
+                    ],
+                    "count": 1,
+                    "is_tag": false,
+                    "label": "Iron Nugget"
+                  }
+                ],
+                [
+                  {
+                    "candidates": [
+                      "minecraft:iron_nugget"
+                    ],
+                    "count": 1,
+                    "is_tag": false,
+                    "label": "Iron Nugget"
+                  },
+                  {
+                    "candidates": [
+                      "minecraft:iron_nugget"
+                    ],
+                    "count": 1,
+                    "is_tag": false,
+                    "label": "Iron Nugget"
+                  },
+                  {
+                    "candidates": [
+                      "minecraft:iron_nugget"
+                    ],
+                    "count": 1,
+                    "is_tag": false,
+                    "label": "Iron Nugget"
+                  }
+                ]
+              ],
+              "id": "lantern_lights:lantern",
+              "inputs": [],
+              "label": "Lantern",
+              "result": {
+                "candidates": [
+                  "lantern_lights:glow_lantern"
+                ],
+                "count": 1,
+                "is_tag": false,
+                "label": "Glow Lantern"
+              },
+              "result_count": 1,
+              "shapeless": false,
+              "source": "C:\\Users\\Matthijs\\ModPageConstructor\\examples\\example-mod\\src\\main\\resources\\data\\lantern_lights\\recipe\\lantern.json",
+              "type": "minecraft:crafting_shaped"
+            },
+            "relative": "recipes/lantern_lights__lantern.png"
+          },
+          {
+            "animated": true,
+            "frames": 3,
+            "path": "C:\\Users\\Matthijs\\ModPageConstructor\\examples\\example-mod\\assets\\recipes\\lantern_lights__lantern_block_cut.gif",
+            "recipe": {
+              "grid": [],
+              "id": "lantern_lights:lantern_block_cut",
+              "inputs": [
+                {
+                  "candidates": [
+                    "lantern_lights:lantern_block",
+                    "lantern_lights:glow_lantern",
+                    "minecraft:sea_lantern"
+                  ],
+                  "count": 1,
+                  "is_tag": true,
+                  "label": "Lantern Blocks"
+                }
+              ],
+              "label": "Lantern Block Cut",
+              "result": {
+                "candidates": [
+                  "lantern_lights:lantern_block"
+                ],
+                "count": 1,
+                "is_tag": false,
+                "label": "Lantern Block"
+              },
+              "result_count": 1,
+              "shapeless": false,
+              "source": "C:\\Users\\Matthijs\\ModPageConstructor\\examples\\example-mod\\src\\main\\resources\\data\\lantern_lights\\recipe\\lantern_block_cut.json",
+              "type": "minecraft:stonecutting"
+            },
+            "relative": "recipes/lantern_lights__lantern_block_cut.gif"
+          },
+          {
+            "animated": false,
+            "frames": 1,
+            "path": "C:\\Users\\Matthijs\\ModPageConstructor\\examples\\example-mod\\assets\\recipes\\lantern_lights__lantern_dust.png",
+            "recipe": {
+              "grid": [
+                [
+                  {
+                    "candidates": [
+                      "lantern_lights:glow_ingot"
+                    ],
+                    "count": 1,
+                    "is_tag": false,
+                    "label": "Glow Ingot"
+                  },
+                  {
+                    "candidates": [
+                      "minecraft:glowstone_dust"
+                    ],
+                    "count": 1,
+                    "is_tag": false,
+                    "label": "Glowstone Dust"
+                  }
+                ],
+                [
+                  {
+                    "candidates": [
+                      "minecraft:redstone"
+                    ],
+                    "count": 1,
+                    "is_tag": false,
+                    "label": "Redstone"
+                  },
+                  null
+                ]
+              ],
+              "id": "lantern_lights:lantern_dust",
+              "inputs": [],
+              "label": "Lantern Dust",
+              "result": {
+                "candidates": [
+                  "lantern_lights:lantern_dust"
+                ],
+                "count": 1,
+                "is_tag": false,
+                "label": "Lantern Dust"
+              },
+              "result_count": 3,
+              "shapeless": true,
+              "source": "C:\\Users\\Matthijs\\ModPageConstructor\\examples\\example-mod\\src\\main\\resources\\data\\lantern_lights\\recipe\\lantern_dust.json",
+              "type": "minecraft:crafting_shapeless"
+            },
+            "relative": "recipes/lantern_lights__lantern_dust.png"
+          }
+        ],
+        "options": {
+          "columns": 3,
+          "scale": 3,
+          "summary": "Show all recipes"
+        }
+      },
+      "empty_text": "_No recipes found in this repo's data files._",
+      "id": "recipes",
+      "layout": "list",
+      "options": {
+        "columns": 3,
+        "scale": 3,
+        "summary": "Show all recipes"
+      },
+      "targets": null,
+      "title": "Recipes"
+    },
+    {
+      "banner": "banners/dependencies.png",
+      "body": null,
+      "data": {
+        "bundled": [],
+        "optional": [
+          {
+            "name": "Mod Menu",
+            "note": "In-game config screen",
+            "url": "https://modrinth.com/mod/modmenu"
+          }
+        ],
+        "required": [
+          {
+            "name": "Fabric API",
+            "note": "Fabric builds only",
+            "url": "https://modrinth.com/mod/fabric-api",
+            "version": ">=0.100.0"
+          }
+        ]
+      },
+      "empty_text": "**None.** This mod is standalone — no other mods are required.",
+      "id": "dependencies",
+      "layout": "list",
+      "options": {},
+      "targets": null,
+      "title": "Dependencies"
+    },
+    {
+      "banner": "banners/incompatibilities.png",
+      "body": null,
+      "data": {
+        "known": [
+          {
+            "name": "Shimmer",
+            "reason": "Both patch the light engine",
+            "url": "https://modrinth.com/mod/shimmer",
+            "workaround": "Disable Shimmer's dynamic lights"
+          }
+        ]
+      },
+      "empty_text": "**None known.** No conflicts have been reported.",
+      "id": "incompatibilities",
+      "layout": "list",
+      "options": {},
+      "targets": null,
+      "title": "Incompatibilities"
+    },
+    {
+      "banner": "banners/installation.png",
+      "body": "1. Install [Fabric Loader](https://fabricmc.net/use/) or NeoForge.\n2. Drop `lantern-lights.jar` (and Fabric API on Fabric) into `mods/`.\n3. Launch the game.",
+      "data": {},
+      "empty_text": null,
+      "id": "installation",
+      "layout": "list",
+      "options": {},
+      "targets": null,
+      "title": "Installation"
+    },
+    {
+      "banner": "banners/configuration.png",
+      "body": "The config lives at `config/lantern-lights.json`:\n\n| Key | Default | Meaning |\n| --- | --- | --- |\n| `radius` | `12` | Light radius in blocks |\n| `smooth` | `true` | Fade light in and out |",
+      "data": {},
+      "empty_text": null,
+      "id": "configuration",
+      "layout": "list",
+      "options": {},
+      "targets": null,
+      "title": "Configuration"
+    },
+    {
+      "banner": "banners/changelog.png",
+      "body": "Generated from `CHANGELOG.md` at build time -- write the entry once, and\nall three pages carry it.",
+      "data": {
+        "elements": [
+          {
+            "body": "",
+            "changes": [
+              {
+                "group": "Added",
+                "subject": "Copper lanterns, and a recipe to cut them from blocks",
+                "title": "Copper lanterns, and a recipe to cut them from blocks",
+                "type": "added",
+                "url": ""
+              },
+              {
+                "group": "Added",
+                "subject": "`radius` is now per-dimension",
+                "title": "`radius` is now per-dimension",
+                "type": "added",
+                "url": ""
+              },
+              {
+                "group": "Fixed",
+                "subject": "Lanterns held in the offhand no longer flicker at chunk borders",
+                "title": "Lanterns held in the offhand no longer flicker at chunk borders",
+                "type": "fixed",
+                "url": ""
+              }
+            ],
+            "count": 3,
+            "date": "2026-08-14",
+            "datetime": "2026-08-14",
+            "description": null,
+            "groups": [
+              {
+                "items": [
+                  {
+                    "group": "Added",
+                    "subject": "Copper lanterns, and a recipe to cut them from blocks",
+                    "title": "Copper lanterns, and a recipe to cut them from blocks",
+                    "type": "added",
+                    "url": ""
+                  },
+                  {
+                    "group": "Added",
+                    "subject": "`radius` is now per-dimension",
+                    "title": "`radius` is now per-dimension",
+                    "type": "added",
+                    "url": ""
+                  }
+                ],
+                "key": "added",
+                "title": "Added"
+              },
+              {
+                "items": [
+                  {
+                    "group": "Fixed",
+                    "subject": "Lanterns held in the offhand no longer flicker at chunk borders",
+                    "title": "Lanterns held in the offhand no longer flicker at chunk borders",
+                    "type": "fixed",
+                    "url": ""
+                  }
+                ],
+                "key": "fixed",
+                "title": "Fixed"
+              }
+            ],
+            "prerelease": false,
+            "subject": "",
+            "tag": "1.2.0",
+            "title": "1.2.0",
+            "unreleased": false,
+            "url": "",
+            "version": "1.2.0"
+          },
+          {
+            "body": "",
+            "changes": [
+              {
+                "group": "Added",
+                "subject": "Glow lanterns craft from any plank",
+                "title": "Glow lanterns craft from any plank",
+                "type": "added",
+                "url": ""
+              },
+              {
+                "group": "Changed",
+                "subject": "Rewrote the light propagation loop; roughly 4x faster on large caves",
+                "title": "Rewrote the light propagation loop; roughly 4x faster on large caves",
+                "type": "changed",
+                "url": ""
+              }
+            ],
+            "count": 2,
+            "date": "2026-06-02",
+            "datetime": "2026-06-02",
+            "description": null,
+            "groups": [
+              {
+                "items": [
+                  {
+                    "group": "Added",
+                    "subject": "Glow lanterns craft from any plank",
+                    "title": "Glow lanterns craft from any plank",
+                    "type": "added",
+                    "url": ""
+                  }
+                ],
+                "key": "added",
+                "title": "Added"
+              },
+              {
+                "items": [
+                  {
+                    "group": "Changed",
+                    "subject": "Rewrote the light propagation loop; roughly 4x faster on large caves",
+                    "title": "Rewrote the light propagation loop; roughly 4x faster on large caves",
+                    "type": "changed",
+                    "url": ""
+                  }
+                ],
+                "key": "changed",
+                "title": "Changed"
+              }
+            ],
+            "prerelease": false,
+            "subject": "",
+            "tag": "1.1.0",
+            "title": "1.1.0",
+            "unreleased": false,
+            "url": "",
+            "version": "1.1.0"
+          },
+          {
+            "body": "",
+            "changes": [
+              {
+                "group": "Added",
+                "subject": "First release",
+                "title": "First release",
+                "type": "added",
+                "url": ""
+              }
+            ],
+            "count": 1,
+            "date": "2026-04-20",
+            "datetime": "2026-04-20",
+            "description": null,
+            "groups": [
+              {
+                "items": [
+                  {
+                    "group": "Added",
+                    "subject": "First release",
+                    "title": "First release",
+                    "type": "added",
+                    "url": ""
+                  }
+                ],
+                "key": "added",
+                "title": "Added"
+              }
+            ],
+            "prerelease": false,
+            "subject": "",
+            "tag": "1.0.0",
+            "title": "1.0.0",
+            "unreleased": false,
+            "url": "",
+            "version": "1.0.0"
+          }
+        ]
+      },
+      "empty_text": null,
+      "id": "changelog",
+      "layout": "changelog",
+      "options": {
+        "collapsed": true,
+        "summary": "What changed in the last three releases"
+      },
+      "targets": null,
+      "title": "Changelog"
+    },
+    {
+      "banner": "banners/faq.png",
+      "body": null,
+      "data": {
+        "items": [
+          {
+            "answer": "Yes. Install it on both sides for the full effect.",
+            "question": "Does it work on a server?"
+          },
+          {
+            "answer": "No, it uses the vanilla light engine.",
+            "question": "Does it break shaders?"
+          }
+        ]
+      },
+      "empty_text": null,
+      "id": "faq",
+      "layout": "list",
+      "options": {},
+      "targets": null,
+      "title": "FAQ"
+    },
+    {
+      "banner": "banners/credits.png",
+      "body": "Textures by **@someone**. Thanks to the Fabric community for the light engine notes.",
+      "data": {},
+      "empty_text": null,
+      "id": "credits",
+      "layout": "list",
+      "options": {},
+      "targets": null,
+      "title": "Credits"
+    },
+    {
+      "banner": "banners/license.png",
+      "body": "Released under the **MIT** license.",
+      "data": {},
+      "empty_text": null,
+      "id": "license",
+      "layout": "list",
+      "options": {},
+      "targets": null,
+      "title": "License"
+    }
+  ],
+  "target": "site",
+  "toc": {
+    "banner": null,
+    "entries": [
+      {
+        "anchor": null,
+        "id": "about",
+        "title": "About"
+      },
+      {
+        "anchor": null,
+        "id": "support",
+        "title": "Supported versions"
+      },
+      {
+        "anchor": null,
+        "id": "notes",
+        "title": "A note from the author"
+      },
+      {
+        "anchor": null,
+        "id": "features",
+        "title": "Features"
+      },
+      {
+        "anchor": null,
+        "id": "gallery",
+        "title": "Gallery"
+      },
+      {
+        "anchor": null,
+        "id": "recipes",
+        "title": "Recipes"
+      },
+      {
+        "anchor": null,
+        "id": "dependencies",
+        "title": "Dependencies"
+      },
+      {
+        "anchor": null,
+        "id": "incompatibilities",
+        "title": "Incompatibilities"
+      },
+      {
+        "anchor": null,
+        "id": "installation",
+        "title": "Installation"
+      },
+      {
+        "anchor": null,
+        "id": "configuration",
+        "title": "Configuration"
+      },
+      {
+        "anchor": null,
+        "id": "changelog",
+        "title": "Changelog"
+      },
+      {
+        "anchor": null,
+        "id": "faq",
+        "title": "FAQ"
+      },
+      {
+        "anchor": null,
+        "id": "credits",
+        "title": "Credits"
+      }
+    ],
+    "id": "contents",
+    "min_sections": 2,
+    "numbered": false,
+    "skip": [
+      "license"
+    ],
+    "style": "list",
+    "targets": null,
+    "title": "Contents"
+  }
+}

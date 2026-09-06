@@ -49,7 +49,8 @@ cd path/to/your-mod-repo
 modpage init            # writes a commented modpage.yml + assets/ folders
 modpage build           # renders all three targets
 modpage build -t readme # or just one
-modpage build -t all    # also the opt-in curseforge-html page (see below)
+modpage build -t all    # also the opt-in curseforge-html page and the site JSON
+modpage build -t site   # the config, after generators, as JSON (see below)
 modpage build --check   # exit 1 if a generated file is out of date (CI)
 modpage sections        # print the shared section skeleton
 modpage generators      # list element generators + preview what yours produce
@@ -292,11 +293,28 @@ changelog and one line in the header.
 | `data.file` | Elements out of JSON or YAML in the repo (`fabric.mod.json`, a data pack) |
 | `config.pluck` | Objects from elsewhere in `modpage.yml`, by dotted path |
 | `config.versions` | The `minecraft:` block as one element per version or loader |
+| `mc.lang` | Every line of a mod's `assets/<ns>/lang/<code>.json`, with the id each key names |
 
 Each takes its own options -- `modpage generators` prints them with a one-line
 summary of what each does. A repo without git (an exported tarball, a fresh
 `init`) is not an error: the git generators warn once and return nothing, and
 the page still builds.
+
+**Display names.** A generated list of ids reads badly, and prettifying an id
+guesses: it gets `Great Helm` right and `TNT` wrong, and it never gets a name
+that is not the id at all. `mc.lang` reads what the game reads, and `data.file`
+takes a `lang:` option that resolves each element's own translation key:
+
+```yaml
+generators:
+  pieces:
+    use: data.file
+    pattern: "src/main/resources/data/*/armorpieces/armor_decoration/*.json"
+    lang: description.translate    # or `true` for a plain `translate:` field
+```
+
+The line becomes each element's `title` and `name`. A key with no translation
+leaves the element as it was, which is what the game does too.
 
 ### Layouts
 
@@ -326,6 +344,36 @@ custom_sections:
     columns: [{field: version, title: Minecraft}, {field: description, title: Loaders}]
     elements: {from: support}
 ```
+
+### Element types
+
+A layout draws a whole list one way. An element carrying `type:` is drawn by a
+template of its own instead:
+
+```yaml
+custom_sections:
+  - id: notes
+    title: A note from the author
+    elements:
+      - type: raw
+        body: |
+          This is a **weekend mod**. It does one thing, and it will keep doing
+          that one thing.
+        html: "<p>This is a <b>weekend mod</b>.</p>"
+```
+
+`type: <name>` renders through `<template>/elements/<name>.<ext>.j2`, where
+`<ext>` is `md`, `html` or `plain` -- the same three partials every layout is
+written in -- looked up on the same loader the templates are. So
+`.modpage/templates/default/elements/<name>.md.j2` in a mod repo wins over the
+packaged one, and a repo can say "this is a socket table" or "this is a piece
+card" without the shared skeleton having to learn what either is. That is the
+same seam `.modpage/generators/` gives the data half.
+
+`raw` is the only packaged type, and is the escape hatch the layouts never had:
+`body:` goes through untouched, and `html:` is used only where the target
+renders HTML at all. A type with no template renders as nothing rather than
+stopping the build.
 
 ### Writing your own
 
@@ -358,6 +406,34 @@ and `ctx.opt_list`), `ctx.git` (tags, commits, remote), plus `ctx.glob`,
 worth saying and `ctx.fail` for a config a human has to fix. Return dicts,
 strings, paths, or anything with an `as_element()`; the pipeline takes it from
 there. A one-off script works too, without registering: `use: tools/pages.py:build`.
+
+## More than a page
+
+Two things a build can write besides the three marketplace pages.
+
+**`-t site`** renders the config, after generators, as JSON -- `dist/site.json`
+by default. Not a page: everything the page templates are given, for a consumer
+that has its own renderer and would rather lay the facts out itself than parse a
+rendered page back apart. The header, the links, the badges, every section with
+its body and its generated elements, every declared generator's list whether or
+not a section used it, and the raw config underneath it all.
+
+**`documents:`** names extra configs, each rendered by the same build to its own
+output:
+
+```yaml
+documents:
+  - id: lighting
+    config: docs/wiki.yml
+    out: "dist/wiki/{target}/lighting.{ext}"
+```
+
+Each is an ordinary config -- its own sections, its own generators, the same
+targets -- so a second page can be prose, or generated, or both, and nothing
+about it is a special case. `out:` is written from the parent config's root;
+`{target}` is the target's id and `{ext}` its extension, and a document rendered
+for more than one target has to use one of them, or every target would write the
+same file.
 
 ## Recipes
 

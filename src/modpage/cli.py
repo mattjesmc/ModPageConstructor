@@ -71,7 +71,10 @@ def _attach_recipes(cfg: config_mod.Config, args: argparse.Namespace) -> None:
 def cmd_build(args: argparse.Namespace) -> int:
     cfg = _load(args)
     _attach_recipes(cfg, args)
-    results = render_mod.render_all(cfg, _resolve_targets(args.target))
+    targets = _resolve_targets(args.target)
+    results = render_mod.render_all(cfg, targets)
+    # Every extra page the config names, rendered the same way to its own output.
+    results += render_mod.render_documents(cfg, targets, load=config_mod.load)
 
     if args.stdout:
         for index, result in enumerate(results):
@@ -138,19 +141,22 @@ def cmd_generators(args: argparse.Namespace) -> int:
     """List the generators available here, and preview what this repo's produce."""
     from . import generators as gen_mod
 
+    path = Path(args.config).resolve() if args.config else config_mod.default_config_path()
+    # A repo's own generators are registered when its .modpage/generators/*.py are imported, so
+    # they have to be loaded BEFORE the list is printed - otherwise the one command that exists
+    # to say what is available is the one place they never appear.
+    cfg = _load(args) if path.is_file() else None
+
     registry = gen_mod.registry()
     print("Available generators:")
     print()
     for name in sorted(registry):
         print(f"  {name:<20} {_paint(gen_mod.describe(name), DIM)}")
 
-    path = Path(args.config).resolve() if args.config else config_mod.default_config_path()
-    if not path.is_file():
+    if cfg is None:
         print()
         print(_paint(f"(no {path.name} here, so nothing is declared yet)", DIM))
         return 0
-
-    cfg = _load(args)
     if not cfg.generated:
         print()
         print(_paint("This repo declares none. Add a 'generators:' block to "

@@ -1,0 +1,13 @@
+{#-
+    The `site` target: the config, after generators, as data.
+
+    Every other target renders a page for a marketplace that will only take text. This one renders
+    for something that has its own renderer - a website, an app, anything that would rather lay the
+    facts out itself than parse a page back apart. So it emits the same context the page templates
+    are given, as JSON: the header, the links, the badges, every section with its body and its
+    generated elements, and every declared generator's list whether or not a section used it.
+
+    It is a template rather than a `json.dumps` in Python for the same reason the pages are: a repo
+    that wants another shape overrides this one file in .modpage/templates and nothing else changes.
+-#}
+{{ site_json(indent=2) }}

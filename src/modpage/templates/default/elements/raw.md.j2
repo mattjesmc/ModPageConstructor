@@ -1,0 +1,10 @@
+{#- `type: raw`: the element's `body` (or `text`) put through untouched.
+
+    The escape hatch the seven layouts never had. A generator that has already produced exactly
+    what a page should say - a table it built itself, a block of HTML - hands it over here rather
+    than being bent into a list of {title, description}. `html:` is emitted only where the target
+    renders HTML at all, so the same element can carry both and neither target sees the other's. -#}
+{{ item.body or item.text or '' }}
+{% if item.html and is_html %}
+{{ item.html }}
+{% endif %}

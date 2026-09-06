@@ -1,0 +1,253 @@
+{
+  "badges": [
+    {
+      "alt": "Loaders",
+      "image": "https://img.shields.io/badge/Loader-Fabric_|_NeoForge-5b21b6?style=for-the-badge",
+      "url": ""
+    },
+    {
+      "alt": "Minecraft versions",
+      "image": "https://img.shields.io/badge/Minecraft-1.21.1_|_1.20.1-5b21b6?style=for-the-badge",
+      "url": ""
+    }
+  ],
+  "extra": {},
+  "gen": {
+    "versions": [
+      {
+        "description": "Fabric, NeoForge",
+        "loaders": [
+          "Fabric",
+          "NeoForge"
+        ],
+        "title": "1.21.1",
+        "version": "1.21.1"
+      },
+      {
+        "description": "Fabric, NeoForge",
+        "loaders": [
+          "Fabric",
+          "NeoForge"
+        ],
+        "title": "1.20.1",
+        "version": "1.20.1"
+      }
+    ]
+  },
+  "header": {
+    "align": "center",
+    "banner": null,
+    "heading_with_banner": false,
+    "section_banner_width": null,
+    "show_title": true,
+    "width": null
+  },
+  "is_html": false,
+  "links": {},
+  "minecraft": {
+    "loaders": [
+      "Fabric",
+      "NeoForge"
+    ],
+    "versions": [
+      "1.21.1",
+      "1.20.1"
+    ]
+  },
+  "platform": "site",
+  "raw": {
+    "assets": {
+      "dir": "assets"
+    },
+    "custom_sections": [
+      {
+        "after": "about",
+        "columns": [
+          {
+            "field": "version",
+            "title": "Minecraft"
+          },
+          {
+            "field": "description",
+            "title": "Loaders"
+          }
+        ],
+        "elements": [
+          {
+            "description": "Fabric, NeoForge",
+            "loaders": [
+              "Fabric",
+              "NeoForge"
+            ],
+            "title": "1.21.1",
+            "version": "1.21.1"
+          },
+          {
+            "description": "Fabric, NeoForge",
+            "loaders": [
+              "Fabric",
+              "NeoForge"
+            ],
+            "title": "1.20.1",
+            "version": "1.20.1"
+          }
+        ],
+        "id": "support",
+        "layout": "table",
+        "title": "Where it works"
+      }
+    ],
+    "generators": {
+      "versions": {
+        "use": "config.versions"
+      }
+    },
+    "minecraft": {
+      "loaders": [
+        "Fabric",
+        "NeoForge"
+      ],
+      "versions": [
+        "1.21.1",
+        "1.20.1"
+      ]
+    },
+    "name": "Lantern Lights — Lighting",
+    "sections": {
+      "about": "The vanilla light engine stores light per block, not per entity. Lantern Lights writes a\nlight value into the block the lantern is attached to and clears it when the lantern moves,\nwhich is why the light follows without a tick of lag and without a light-emitting entity.\n",
+      "faq": {
+        "items": [
+          {
+            "a": "No. A lantern out of view is not lit, because nothing is asking.",
+            "q": "Does it cost anything at range?"
+          },
+          {
+            "a": "Yes; the light is written server-side and travels in the ordinary chunk update.",
+            "q": "Does it work on a server?"
+          }
+        ]
+      }
+    },
+    "slug": "lantern-lights",
+    "tagline": "How the light follows the lantern, and what it costs.",
+    "toc": false
+  },
+  "sections": [
+    {
+      "banner": null,
+      "body": "The vanilla light engine stores light per block, not per entity. Lantern Lights writes a\nlight value into the block the lantern is attached to and clears it when the lantern moves,\nwhich is why the light follows without a tick of lag and without a light-emitting entity.",
+      "data": {},
+      "empty_text": null,
+      "id": "about",
+      "layout": "list",
+      "options": {},
+      "targets": null,
+      "title": "About"
+    },
+    {
+      "banner": null,
+      "body": null,
+      "data": {
+        "columns": [
+          {
+            "field": "version",
+            "title": "Minecraft"
+          },
+          {
+            "field": "description",
+            "title": "Loaders"
+          }
+        ],
+        "elements": [
+          {
+            "description": "Fabric, NeoForge",
+            "loaders": [
+              "Fabric",
+              "NeoForge"
+            ],
+            "title": "1.21.1",
+            "version": "1.21.1"
+          },
+          {
+            "description": "Fabric, NeoForge",
+            "loaders": [
+              "Fabric",
+              "NeoForge"
+            ],
+            "title": "1.20.1",
+            "version": "1.20.1"
+          }
+        ]
+      },
+      "empty_text": null,
+      "id": "support",
+      "layout": "table",
+      "options": {
+        "columns": [
+          {
+            "field": "version",
+            "title": "Minecraft"
+          },
+          {
+            "field": "description",
+            "title": "Loaders"
+          }
+        ]
+      },
+      "targets": null,
+      "title": "Where it works"
+    },
+    {
+      "banner": null,
+      "body": null,
+      "data": {
+        "bundled": [],
+        "optional": [],
+        "required": []
+      },
+      "empty_text": "**None.** This mod is standalone — no other mods are required.",
+      "id": "dependencies",
+      "layout": "list",
+      "options": {},
+      "targets": null,
+      "title": "Dependencies"
+    },
+    {
+      "banner": null,
+      "body": null,
+      "data": {
+        "known": []
+      },
+      "empty_text": "**None known.** No conflicts have been reported.",
+      "id": "incompatibilities",
+      "layout": "list",
+      "options": {},
+      "targets": null,
+      "title": "Incompatibilities"
+    },
+    {
+      "banner": null,
+      "body": null,
+      "data": {
+        "items": [
+          {
+            "answer": "No. A lantern out of view is not lit, because nothing is asking.",
+            "question": "Does it cost anything at range?"
+          },
+          {
+            "answer": "Yes; the light is written server-side and travels in the ordinary chunk update.",
+            "question": "Does it work on a server?"
+          }
+        ]
+      },
+      "empty_text": null,
+      "id": "faq",
+      "layout": "list",
+      "options": {},
+      "targets": null,
+      "title": "FAQ"
+    }
+  ],
+  "target": "site",
+  "toc": null
+}

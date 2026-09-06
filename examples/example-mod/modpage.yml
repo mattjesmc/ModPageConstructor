@@ -138,4 +138,28 @@ custom_sections:
       - {field: description, title: Loaders}
     elements: {from: support}
 
+  # An element carrying `type:` is drawn by elements/<type>.<target>.j2 rather than by a layout.
+  # `raw` is the packaged one and is the escape hatch: the body goes through untouched, and the
+  # `html:` half is used only where the target renders HTML. A mod that wants a shape of its own -
+  # a socket table, a piece card - puts the template in .modpage/templates/default/elements/ and
+  # names it here, and the shared skeleton never has to know what either is.
+  - id: notes
+    title: A note from the author
+    after: support
+    elements:
+      - type: raw
+        body: |
+          Lantern Lights is a **weekend mod**. It does one thing, it will keep doing that
+          one thing, and it will not grow a config screen.
+        html: |
+          <p><em>Lantern Lights</em> is a <b>weekend mod</b>. It does one thing, it will keep
+          doing that one thing, and it will not grow a config screen.</p>
+
+# Extra pages this build writes, each an ordinary config of its own. `{target}` in `out` is the
+# target's own extension, so one entry serves every target the document is rendered for.
+documents:
+  - id: lighting
+    config: docs/wiki.yml
+    out: "dist/wiki/{target}/lighting.{ext}"
+
 footer: "Issues and pull requests are welcome."

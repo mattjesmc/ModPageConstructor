@@ -264,6 +264,32 @@
     table on CurseForge, from a single declaration.
     ------------------------------------------------------------------------ -#}
 
+{#- ------------------------------------------------------------------------
+    Typed elements.
+
+    An element carrying `type:` is drawn by a template of its own rather than by the section's
+    `layout:`: `<template>/elements/<type>.md.j2`, looked up on the same loader the partials
+    are, so `.modpage/templates/<template>/elements/<type>.md.j2` in a mod's repository wins
+    over the packaged one. That is the seam a repo has for saying "this is a socket table" or
+    "this is a piece card" without the shared skeleton having to know what either is - the same
+    shape the generator registry already has for the data half.
+
+    A type with no template renders as nothing rather than as an error: a page that is missing
+    one block is a better answer than a build that stops, and the warning belongs to whoever
+    wrote the type. `raw` is packaged, and is the escape hatch the layouts never had.
+    ------------------------------------------------------------------------ -#}
+{%- macro has_types(items) -%}
+{{ 'yes' if (items or []) | selectattr('type', 'defined') | selectattr('type') | list else '' }}
+{%- endmacro -%}
+
+{% macro typed(items) %}
+{% for item in items or [] %}
+{% if item.type %}
+{% include [cfg.template ~ '/elements/' ~ item.type ~ '.md.j2'] ignore missing %}
+{% endif %}
+{% endfor %}
+{% endmacro %}
+
 {%- macro cell(text) -%}
 {{ (text if text is not none else '') | string | replace('|', '\|') | replace('\n', ' ') }}
 {%- endmacro -%}
@@ -374,7 +400,9 @@
 {#- Dispatch on the section's layout, optionally folding the whole list away
     the way the recipe grid does. -#}
 {% macro elements_body(section) %}
-{% if section.layout == 'table' %}
+{% if has_types(section.data['elements']) %}
+{{ typed(section.data['elements']) }}
+{% elif section.layout == 'table' %}
 {{ elements_table(section) }}
 {% elif section.layout == 'changelog' %}
 {{ elements_changelog(section) }}

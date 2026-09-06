@@ -1,0 +1,7 @@
+{#- `type: raw` on an HTML target: the element's `html` if it has one, else its Markdown body
+    converted. See elements/raw.md.j2 for what this type is for. -#}
+{% if item.html %}
+{{ item.html }}
+{% else %}
+{{ (item.body or item.text or '') | md }}
+{% endif %}

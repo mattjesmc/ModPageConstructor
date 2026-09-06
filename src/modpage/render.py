@@ -41,6 +41,11 @@ TARGETS: dict[str, Target] = {
     # rendered result into the WYSIWYG editor. Pasting the source does not work.
     "curseforge-html": Target("curseforge.html.j2", "curseforge",
                               html=True, absolute_urls=True, default=False),
+    # Opt in: not a page at all. Everything the page templates are given, as JSON, for a consumer
+    # that has its own renderer -- a website, an app -- and would rather lay the facts out itself
+    # than parse a rendered page back apart. Absolute URLs, because whoever reads this is not
+    # serving from the repository.
+    "site": Target("site.json.j2", "site", absolute_urls=True, anchors=False, default=False),
 }
 DEFAULT_TARGETS: list[str] = [name for name, spec in TARGETS.items() if spec.default]
 
@@ -157,6 +162,46 @@ def _toc_context(config: Config, target: str,
     return {**toc, "entries": entries}
 
 
+def _jsonable(value: Any) -> Any:
+    """Anything the context holds, as something json can write.
+
+    Sections are dataclasses and generated elements are whatever a generator returned; both are
+    plain data underneath. A Path becomes its string, a date its ISO form, and anything else its
+    repr rather than an exception -- a target that refuses to render because one generator handed
+    back an odd object would be a worse answer than a string saying what it was."""
+    from datetime import date, datetime
+    from dataclasses import asdict, is_dataclass
+
+    if value is None or isinstance(value, (str, int, float, bool)):
+        return value
+    if isinstance(value, Path):
+        return str(value)
+    if isinstance(value, (date, datetime)):
+        return value.isoformat()
+    if isinstance(value, dict):
+        return {str(k): _jsonable(v) for k, v in value.items()}
+    if isinstance(value, (list, tuple, set)):
+        return [_jsonable(v) for v in value]
+    if is_dataclass(value) and not isinstance(value, type):
+        return {k: _jsonable(v) for k, v in asdict(value).items()}
+    return repr(value)
+
+
+def _site_json(context: dict[str, Any]) -> str:
+    """The render context, as JSON: what the `site` target emits.
+
+    The whole context minus the pieces that are functions or that only mean something inside a
+    Jinja render -- `cfg` (the Config object itself, whose fields are already spread across the
+    rest), and `partials` (a template path)."""
+    import json
+
+    body = {key: _jsonable(value) for key, value in context.items()
+            if key not in ("cfg", "partials", "mod", "site_json")}
+    # The raw config too, so nothing a repo put in modpage.yml is lost on the way through.
+    body["raw"] = _jsonable(context["cfg"].raw)
+    return json.dumps(body, indent=2, ensure_ascii=False, sort_keys=True)
+
+
 def render_target(config: Config, target: str) -> Rendered:
     if target not in TARGETS:
         raise ConfigError(f"unknown target '{target}'. Known: {', '.join(TARGETS)}")
@@ -194,8 +239,69 @@ def render_target(config: Config, target: str) -> Rendered:
         # them -- a custom template can lay them out however it likes.
         "gen": config.generated,
     }
-    return Rendered(target, out_path, _tidy(template.render(**context)), warnings)
+    # The `site` target's whole body is the context as JSON; the template asks for it by name so
+    # that a repo can override the file and emit a different shape without touching Python.
+    context["site_json"] = lambda indent=2: _site_json(context)
+    rendered = template.render(**context)
+    # JSON is whitespace-sensitive in a way prose is not: _tidy would collapse the blank lines
+    # inside a string and strip the trailing newline a file wants.
+    return Rendered(target, out_path, rendered if target == "site" else _tidy(rendered), warnings)
 
 
 def render_all(config: Config, targets: list[str] | None = None) -> list[Rendered]:
     return [render_target(config, target) for target in (targets or DEFAULT_TARGETS)]
+
+
+def render_documents(config: Config, targets: list[str] | None = None,
+                     load: Any = None) -> list[Rendered]:
+    """Every extra config the ``documents:`` block names, rendered to its own output.
+
+    A build has more than one page to write the moment a mod has a wiki. Each document is an
+    ordinary config with its own sections and its own generators - so a page can be prose, or
+    generated, or both, and nothing about it is a special case - and the only thing the parent
+    config says about it is which file it is and where its output goes.
+
+    `load` is the config loader, passed in rather than imported, so this module keeps not knowing
+    how a config is read.
+    """
+    if not config.documents:
+        return []
+    if load is None:
+        from .config import load  # type: ignore[assignment]
+
+    out: list[Rendered] = []
+    for entry in config.documents:
+        path = config.root / entry["config"]
+        if not path.is_file():
+            raise ConfigError(f"documents: no config at {entry['config']}")
+        document = load(path)
+        wanted = entry.get("targets") or []
+        for target in (targets or DEFAULT_TARGETS):
+            if target not in TARGETS or (wanted and target not in wanted):
+                continue
+            # A document that says where its own targets land is left alone; otherwise the
+            # parent's `out:` decides, which is the ordinary case - a document should not have to
+            # repeat five paths to be a second page.
+            if not (document.raw.get("outputs") or {}).get(target):
+                where = entry["out"].replace("{target}", target).replace("{ext}", _extension(target))
+                rendering = [t for t in (targets or DEFAULT_TARGETS)
+                             if t in TARGETS and (not wanted or t in wanted)]
+                if where == entry["out"] and len(rendering) > 1:
+                    raise ConfigError(
+                        f"documents: '{entry['id']}' has out: {entry['out']!r}, which names no "
+                        "{target} or {ext}, so every target would write the same file. Put one in, "
+                        "or render one target at a time."
+                    )
+                # `out:` is written from the parent config's root, which is where the person
+                # writing it is standing; the document's own root may be a subfolder, so the path
+                # is resolved here rather than left relative to the wrong thing.
+                document.outputs[target] = str((config.root / where).resolve())
+            out.append(render_target(document, target))
+    return out
+
+
+def _extension(target: str) -> str:
+    """The file extension a target's output wants, for a `documents:` entry that says `{ext}`."""
+    if target == "site":
+        return "json"
+    return "html" if TARGETS[target].html else "md"

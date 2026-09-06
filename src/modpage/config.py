@@ -249,6 +249,11 @@ class Config:
     footer: str | None
     #: ``None`` when the config asks for no contents list.
     toc: dict[str, Any] | None
+    #: Extra configs rendered alongside this one, as ``{id, config, out}``: a build that has
+    #: more than one page to write. Each is an ordinary modpage.yml with its own sections and
+    #: its own generators, rendered to its own output - which is what a wiki is, and what one
+    #: page per marketplace never was.
+    documents: list[dict[str, Any]] = field(default_factory=list)
     #: Every declared generator's elements, keyed by name, for templates that
     #: want a list the shared skeleton has no section for.
     generated: dict[str, list[Any]] = field(default_factory=dict)
@@ -421,12 +426,18 @@ def _build_sections(raw: dict[str, Any], root: Path, assets_dir: str, banner_dir
         else:
             order.append(sid)
 
+    # A page for a marketplace has to say what it depends on and what it clashes with, even when
+    # the answer is "nothing" - a missing Dependencies heading reads as an oversight. A DOCUMENT is
+    # not that page: a wiki page about fittings has no dependencies, and a heading saying so is
+    # noise. `shared_sections: false` says which kind of page this config is.
+    always = ALWAYS_RENDER if raw.get("shared_sections", True) is not False else set()
+
     if raw.get("order"):
         explicit = [str(sid) for sid in raw["order"]]
         unknown = [sid for sid in explicit if sid not in titles]
         if unknown:
             raise ConfigError(f"'order' references unknown sections: {', '.join(unknown)}")
-        missing = [sid for sid in sorted(ALWAYS_RENDER) if sid not in explicit]
+        missing = [sid for sid in sorted(always) if sid not in explicit]
         if missing:
             raise ConfigError(
                 f"'order' must include the shared section(s): {', '.join(missing)}"
@@ -437,7 +448,7 @@ def _build_sections(raw: dict[str, Any], root: Path, assets_dir: str, banner_dir
     for sid in order:
         cfg = declared.get(sid)
         if cfg is False:
-            if sid in ALWAYS_RENDER:
+            if sid in always:
                 raise ConfigError(
                     f"'{sid}' is a shared section and cannot be disabled; leave it empty instead"
                 )
@@ -503,7 +514,7 @@ def _build_sections(raw: dict[str, Any], root: Path, assets_dir: str, banner_dir
             options={k: v for k, v in cfg.items() if k not in SECTION_KEYS},
         )
         opted_in = sid in OPT_IN_SECTIONS and sid in declared
-        if section.is_empty and sid not in ALWAYS_RENDER and not opted_in                 and not cfg.get("always"):
+        if section.is_empty and sid not in always and not opted_in                 and not cfg.get("always"):
             continue
         sections.append(section)
     return sections
@@ -556,7 +567,15 @@ def load(path: Path, *, run_generators: bool = True) -> Config:
     if not isinstance(raw, dict):
         raise ConfigError(f"{path} must contain a YAML mapping at the top level")
 
+    # A config normally describes the repository it sits in. A config that sits in a subfolder -
+    # a wiki page under docs/wiki/, named by a `documents:` entry - describes the repository above
+    # it, and says so with `root:`. Everything else here then reads the same files the main config
+    # does: the same assets, the same data, the same .modpage/generators.
     root = path.parent.resolve()
+    if raw.get("root"):
+        root = (root / str(raw["root"])).resolve()
+        if not root.is_dir():
+            raise ConfigError(f"{path}: root: {raw['root']!r} is not a folder")
     name = raw.get("name")
     if not name:
         raise ConfigError(f"{path} is missing the required 'name' field")
@@ -606,8 +625,39 @@ def load(path: Path, *, run_generators: bool = True) -> Config:
         "modrinth": "dist/modrinth.md",
         "curseforge": "dist/curseforge.md",
         "curseforge-html": "dist/curseforge.html",
+        "site": "dist/site.json",
     }
     outputs.update({str(k): str(v) for k, v in (raw.get("outputs") or {}).items()})
+
+    # `documents:` - a list of {id, config, out}. Each is another config file, rendered with the
+    # same targets to the output the entry names. Deliberately small: it says WHICH files, and
+    # each of those files says everything else about itself, so a document is not a second
+    # config language.
+    documents: list[dict[str, Any]] = []
+    for entry in (raw.get("documents") or []):
+        if isinstance(entry, str):
+            entry = {"config": entry}
+        if not isinstance(entry, dict) or not entry.get("config"):
+            warnings.append(f"documents: {entry!r} names no config file; ignored")
+            continue
+        config_path = str(entry["config"])
+        document_id = str(entry.get("id") or Path(config_path).stem)
+        # `targets:` narrows a document to some of the build's targets. A wiki page that only
+        # ever feeds a website is a `site` document and has no business being rendered three more
+        # times as Markdown nobody reads.
+        document_targets = entry.get("targets")
+        documents.append({
+            "id": document_id,
+            "config": config_path,
+            "targets": ([str(t) for t in document_targets]
+                        if isinstance(document_targets, list)
+                        else ([str(document_targets)] if document_targets else [])),
+            # Where it lands, written from THIS config's root. `{target}` is the target's id
+            # and `{ext}` its file extension, so one entry serves every target a document is
+            # rendered for without naming each - and a document rendered for more than one target
+            # has to say one of them, or every target would write the same file.
+            "out": str(entry.get("out") or f"dist/{{target}}/{document_id}.{{ext}}"),
+        })
 
     return Config(
         root=root,
@@ -624,6 +674,7 @@ def load(path: Path, *, run_generators: bool = True) -> Config:
         badges=_build_badges(raw, links, minecraft, slug, license_name),
         sections=_build_sections(raw, root, assets_dir, banner_dir, license_name),
         outputs=outputs,
+        documents=documents,
         template=str(raw.get("template", "default")),
         footer=raw.get("footer"),
         toc=_build_toc(raw, root, assets_dir, banner_dir),
