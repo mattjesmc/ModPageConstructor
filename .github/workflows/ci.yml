@@ -18,6 +18,13 @@ jobs:
       - run: python -m pip install --quiet -e .
       - run: modpage build -c examples/example-mod/modpage.yml -t all --check --offline
       - run: modpage generators -c examples/example-mod/modpage.yml
+      - name: A Linux rebuild must not change any committed image
+        run: |
+          if [ -n "$(git status --porcelain)" ]; then
+            git status --porcelain
+            echo "::error::the build changed tracked files; rendering is not platform-independent"
+            exit 1
+          fi
 
   action:
     name: Composite action runs against the example
