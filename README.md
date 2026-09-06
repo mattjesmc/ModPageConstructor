@@ -27,15 +27,15 @@ a release tag so a template change here never rewrites a page you did not ask
 to change:
 
 ```bash
-python -m pip install "git+https://github.com/mattjesmc/ModPageConstructor@v0.4.0"
+python -m pip install "git+https://github.com/mattjesmc/ModPageConstructor@v0.4.1"
 ```
 
 Or run it without installing anything, with [uv](https://docs.astral.sh/uv/)
 or `pipx`:
 
 ```bash
-uvx --from "git+https://github.com/mattjesmc/ModPageConstructor@v0.4.0" modpage build
-pipx run --spec "git+https://github.com/mattjesmc/ModPageConstructor@v0.4.0" modpage build
+uvx --from "git+https://github.com/mattjesmc/ModPageConstructor@v0.4.1" modpage build
+pipx run --spec "git+https://github.com/mattjesmc/ModPageConstructor@v0.4.1" modpage build
 ```
 
 If `modpage` is not on your PATH afterwards, `python -m modpage <args>` works
@@ -81,7 +81,7 @@ jobs:
         with:
           fetch-depth: 0     # generators read tags and history
           ref: ${{ github.event.repository.default_branch }}
-      - uses: mattjesmc/ModPageConstructor@v0.4.0
+      - uses: mattjesmc/ModPageConstructor@v0.4.1
 ```
 
 `fetch-depth: 0` matters: a shallow clone has no tags and one commit, so the
@@ -106,7 +106,7 @@ It exposes one output, `changed`, for steps that want to react. Use
 with `actions/cache`, so the first build after a new recipe fetches a handful of
 PNGs and later builds fetch nothing.
 
-Version pinning is the one thing to keep an eye on. The `@v0.4.0` in `uses:` is
+Version pinning is the one thing to keep an eye on. The `@v0.4.1` in `uses:` is
 the generator version the pages are built with, and `init` writes whichever
 version wrote the scaffold. Bump it on purpose, then look at the resulting
 commit.

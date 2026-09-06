@@ -31,7 +31,7 @@ jobs:
           # instead so the regenerated changelog has somewhere to be committed.
           ref: ${{ github.event.repository.default_branch }}
 
-      - uses: mattjesmc/ModPageConstructor@v0.4.0
+      - uses: mattjesmc/ModPageConstructor@v0.4.1
         # with:
         #   config: modpage.yml
         #   targets: readme modrinth curseforge

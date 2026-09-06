@@ -2,7 +2,7 @@
 
 The card is composed at native texture scale (16px items) and only then scaled
 up with nearest-neighbour, so the pixels stay sharp. Slot counts are drawn after
-the upscale so the digits are not blocky.
+the upscale from a built-in pixel font, so they look the same on every machine.
 """
 
 from __future__ import annotations
@@ -11,7 +11,7 @@ import io
 from dataclasses import dataclass
 from pathlib import Path
 
-from PIL import Image, ImageDraw, ImageFont
+from PIL import Image, ImageDraw, ImageSequence
 
 from .recipes import Ingredient, Recipe
 from .textures import TextureResolver
@@ -44,13 +44,51 @@ class RecipeImage:
     frames: int
 
 
-def _font(size: int):
-    for name in ("segoeuib.ttf", "arialbd.ttf", "DejaVuSans-Bold.ttf"):
-        try:
-            return ImageFont.truetype(name, size)
-        except OSError:
-            continue
-    return ImageFont.load_default()
+# Stack counts are drawn from these 5x7 glyphs, in the shape of Minecraft's own
+# font, rather than from a system font. A system font would make the pixels
+# depend on the machine (Segoe on Windows, DejaVu on a Linux runner), and a
+# page rebuilt in CI would then rewrite every badge once per platform.
+GLYPH_W, GLYPH_H = 5, 7
+_DIGITS = {
+    "0": (".###.", "#...#", "#..##", "#.#.#", "##..#", "#...#", ".###."),
+    "1": ("..#..", ".##..", "..#..", "..#..", "..#..", "..#..", ".###."),
+    "2": (".###.", "#...#", "....#", "...#.", "..#..", ".#...", "#####"),
+    "3": (".###.", "#...#", "....#", "..##.", "....#", "#...#", ".###."),
+    "4": ("...#.", "..##.", ".#.#.", "#..#.", "#####", "...#.", "...#."),
+    "5": ("#####", "#....", "####.", "....#", "....#", "#...#", ".###."),
+    "6": ("..##.", ".#...", "#....", "####.", "#...#", "#...#", ".###."),
+    "7": ("#####", "....#", "...#.", "..#..", ".#...", ".#...", ".#..."),
+    "8": (".###.", "#...#", "#...#", ".###.", "#...#", "#...#", ".###."),
+    "9": (".###.", "#...#", "#...#", ".####", "....#", "..#..", ".##.."),
+}
+COUNT_TEXT = (255, 255, 255)
+COUNT_SHADOW = (63, 63, 63)
+
+
+def _draw_count(draw: ImageDraw.ImageDraw, anchor_x: int, anchor_y: int,
+                count: int, scale: int) -> None:
+    """Draw ``count`` with its bottom-right corner at the logical pixel (anchor_x, anchor_y).
+
+    Digits are 5x7 texture pixels with a one-pixel gap, drawn as ``scale``-sized
+    blocks with a one-pixel drop shadow, the way the game draws stack sizes.
+    """
+    text = str(count)
+    width = len(text) * (GLYPH_W + 1) - 1
+    left = anchor_x - width           # the shadow lands on anchor_x itself
+    top = anchor_y - GLYPH_H
+    for dx, dy, colour in ((1, 1, COUNT_SHADOW), (0, 0, COUNT_TEXT)):
+        for index, char in enumerate(text):
+            glyph = _DIGITS.get(char)
+            if glyph is None:
+                continue
+            origin_x = left + index * (GLYPH_W + 1) + dx
+            for row, bits in enumerate(glyph):
+                for col, bit in enumerate(bits):
+                    if bit != "#":
+                        continue
+                    px = (origin_x + col) * scale
+                    py = (top + row + dy) * scale
+                    draw.rectangle([px, py, px + scale - 1, py + scale - 1], fill=colour)
 
 
 def _missing_texture() -> Image.Image:
@@ -178,14 +216,8 @@ class RecipeRenderer:
         if not counts:
             return big
         draw = ImageDraw.Draw(big)
-        font = _font(max(9, 4 * self.scale))
         for x, y, count in counts:
-            text = str(count)
-            box = draw.textbbox((0, 0), text, font=font)
-            px = x * self.scale - (box[2] - box[0]) - 1
-            py = y * self.scale - (box[3] - box[1]) - 3
-            draw.text((px + 1, py + 1), text, font=font, fill=(20, 20, 20))
-            draw.text((px, py), text, font=font, fill=(255, 255, 255))
+            _draw_count(draw, x, y, count, self.scale)
         return big
 
     # -- public -----------------------------------------------------------
@@ -214,8 +246,12 @@ class RecipeRenderer:
 
         payload = buffer.getvalue()
         out_dir.mkdir(parents=True, exist_ok=True)
-        # Only touch the file when the bytes change, so git and --check stay quiet.
-        if not out_path.is_file() or out_path.read_bytes() != payload:
+        # Only touch the file when the picture changes, so git and --check stay
+        # quiet. Comparing pixels rather than bytes matters: the same frames
+        # encode a few bytes differently across Pillow builds (Windows vs the
+        # manylinux wheels), and a byte comparison would have every CI run on a
+        # new platform rewrite every image once.
+        if not out_path.is_file() or not _same_picture(out_path.read_bytes(), payload):
             out_path.write_bytes(payload)
 
         # Drop a stale counterpart if a recipe switched between static and animated.
@@ -230,6 +266,25 @@ class RecipeRenderer:
             animated=animated,
             frames=len(images),
         )
+
+
+def _frames(payload: bytes) -> list[tuple[bytes, int]]:
+    """Every frame of an encoded image as raw RGBA bytes, with its duration."""
+    with Image.open(io.BytesIO(payload)) as image:
+        return [
+            (frame.convert("RGBA").tobytes(), int(frame.info.get("duration", 0)))
+            for frame in ImageSequence.Iterator(image)
+        ]
+
+
+def _same_picture(existing: bytes, fresh: bytes) -> bool:
+    """True when two encoded images show the same frames for the same durations."""
+    if existing == fresh:
+        return True
+    try:
+        return _frames(existing) == _frames(fresh)
+    except Exception:  # noqa: BLE001 - an unreadable file is simply not the same
+        return False
 
 
 def build_for(config, *, offline: bool = False) -> tuple[list[RecipeImage], list[str]]:
