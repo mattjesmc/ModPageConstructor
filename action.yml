@@ -41,7 +41,7 @@ outputs:
 runs:
   using: composite
   steps:
-    - uses: actions/setup-python@v5
+    - uses: actions/setup-python@v7
       with:
         python-version: ${{ inputs.python-version }}
 
@@ -59,7 +59,7 @@ runs:
         echo "dir=$(dirname "$MODPAGE_CONFIG")" >> "$GITHUB_OUTPUT"
 
     - name: Restore the vanilla texture cache
-      uses: actions/cache@v4
+      uses: actions/cache@v6
       with:
         path: ${{ steps.locate.outputs.dir }}/.modpage/cache
         key: modpage-cache-${{ hashFiles('**/modpage.yml', '**/data/**/recipe*/*.json') }}

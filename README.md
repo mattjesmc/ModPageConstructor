@@ -77,7 +77,7 @@ jobs:
   pages:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         with:
           fetch-depth: 0     # generators read tags and history
           ref: ${{ github.event.repository.default_branch }}

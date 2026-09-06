@@ -11,8 +11,8 @@ jobs:
     name: Example repo builds and is up to date
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
         with:
           python-version: "3.12"
       - run: python -m pip install --quiet -e .
@@ -23,7 +23,7 @@ jobs:
     name: Composite action runs against the example
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - uses: ./
         with:
           config: examples/example-mod/modpage.yml

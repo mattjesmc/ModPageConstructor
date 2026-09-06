@@ -23,7 +23,7 @@ jobs:
   pages:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         with:
           # Generators read tags and history; a shallow clone would see none.
           fetch-depth: 0
