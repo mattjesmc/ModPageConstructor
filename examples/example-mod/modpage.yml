@@ -27,6 +27,30 @@ header:
   width: 720
   section_banner_width: 480
 
+toc:
+  title: Contents
+  style: list          # or `inline` for one centred row of links
+  skip: [license]
+
+# Element generators: content pulled from the repo instead of typed out again.
+# `modpage generators` shows what each one currently produces.
+generators:
+  # Every release the hand-written CHANGELOG.md describes.
+  releases:
+    use: changelog.file
+    limit: 3
+
+  # Every screenshot in assets/gallery/, captioned from its file name.
+  screenshots:
+    use: files.glob
+    pattern: "gallery/*.png"
+    captions:                      # file stem -> caption; the rest are prettified
+      overview: A lit mineshaft, no torches placed
+
+  # The `minecraft:` block above, crossed into one row per version.
+  support:
+    use: config.versions
+
 sections:
   about: |
     Lantern Lights replaces the vanilla lantern with a dynamic light source that
@@ -44,9 +68,7 @@ sections:
       - Server-side friendly, with client-only rendering
 
   gallery:
-    images:
-      - src: gallery/overview.png
-        caption: A lit mineshaft, no torches placed
+    images: {from: screenshots}
 
   recipes:
     columns: 3
@@ -86,6 +108,14 @@ sections:
     | `radius` | `12` | Light radius in blocks |
     | `smooth` | `true` | Fade light in and out |
 
+  changelog:
+    elements: {from: releases}
+    collapsed: true
+    summary: "What changed in the last three releases"
+    body: |
+      Generated from `CHANGELOG.md` at build time -- write the entry once, and
+      all three pages carry it.
+
   faq:
     items:
       - q: Does it work on a server?
@@ -95,5 +125,15 @@ sections:
 
   credits: |
     Textures by **@someone**. Thanks to the Fabric community for the light engine notes.
+
+custom_sections:
+  - id: support
+    title: Supported versions
+    after: about
+    layout: table
+    columns:
+      - {field: version, title: Minecraft}
+      - {field: description, title: Loaders}
+    elements: {from: support}
 
 footer: "Issues and pull requests are welcome."

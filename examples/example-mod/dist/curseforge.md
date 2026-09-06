@@ -10,6 +10,23 @@
 
 ---
 
+## Contents
+
+- About
+- Supported versions
+- Features
+- Gallery
+- Recipes
+- Dependencies
+- Incompatibilities
+- Installation
+- Configuration
+- Changelog
+- FAQ
+- Credits
+
+---
+
 ![About](https://raw.githubusercontent.com/Matthijs/lantern-lights/main/assets/banners/about.png)
 
 Lantern Lights replaces the vanilla lantern with a dynamic light source that
@@ -17,6 +34,15 @@ follows the block it is attached to, so corridors, mineshafts and boats stay
 lit without a single command block.
 
 It is a drop-in change: no new items, no world data, nothing to migrate.
+
+---
+
+![Supported versions](https://raw.githubusercontent.com/Matthijs/lantern-lights/main/assets/banners/support.png)
+
+| Minecraft | Loaders |
+| --- | --- |
+| 1.21.1 | Fabric, NeoForge |
+| 1.20.1 | Fabric, NeoForge |
 
 ---
 
@@ -88,6 +114,40 @@ The config lives at `config/lantern-lights.json`:
 | --- | --- | --- |
 | `radius` | `12` | Light radius in blocks |
 | `smooth` | `true` | Fade light in and out |
+
+---
+
+![Changelog](https://raw.githubusercontent.com/Matthijs/lantern-lights/main/assets/banners/changelog.png)
+
+Generated from `CHANGELOG.md` at build time -- write the entry once, and
+all three pages carry it.
+
+**1.2.0** · 2026-08-14
+
+*Added*
+
+- Copper lanterns, and a recipe to cut them from blocks
+- `radius` is now per-dimension
+
+*Fixed*
+
+- Lanterns held in the offhand no longer flicker at chunk borders
+
+**1.1.0** · 2026-06-02
+
+*Added*
+
+- Glow lanterns craft from any plank
+
+*Changed*
+
+- Rewrote the light propagation loop; roughly 4x faster on large caves
+
+**1.0.0** · 2026-04-20
+
+*Added*
+
+- First release
 
 ---
 

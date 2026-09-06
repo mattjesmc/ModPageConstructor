@@ -43,6 +43,55 @@ header:
   # section_banner_width: 520
   # heading_with_banner: false     # also print a text heading under each banner
 
+# A contents list between the header and the first section. Leave the whole
+# block out for no list at all.
+# toc:
+#   title: Contents      # heading above the list; false for none
+#   style: list          # list (bulleted) | inline (one centred row of links)
+#   numbered: false
+#   skip: [license]      # section ids to leave out
+#   min_sections: 2      # skip the list when the page has fewer sections
+#   targets: [readme, modrinth]   # default: every target
+#   banner: banners/contents.png  # auto-detected if the file exists
+
+# Element generators build page content from the repo instead of from this
+# file, so a release or a new screenshot updates the pages on its own.
+# `modpage generators` lists what is available and previews what yours produce.
+# generators:
+#   releases:                      # every tagged release, with its commits
+#     use: git.changelog           # or changelog.file, to read CHANGELOG.md
+#     match: "v*"
+#     limit: 5
+#   screenshots:                   # every image in assets/gallery/
+#     use: files.glob
+#     pattern: "gallery/*.png"
+#   support:                       # the `minecraft:` block above, as rows
+#     use: config.versions
+#
+# Reference one anywhere a list is expected with `{from: <name>}`. In a list it
+# splices, so generated and hand-written entries can sit side by side:
+#
+#   sections:
+#     gallery:
+#       images: {from: screenshots}
+#     features:
+#       items:
+#         - title: Written by hand
+#         - from: releases          # ...and the rest generated
+#           limit: 3
+#
+# Every reference can filter and reshape what it gets, with `where`, `when`,
+# `sort`, `limit`, `offset`, `map`, `fields`, `unique` and `group_by`.
+#
+# Write your own by dropping a module in .modpage/generators/:
+#
+#   from modpage.generators import generator
+#
+#   @generator("mymod.showcase")
+#   def showcase(ctx):
+#       return [{"title": p.stem, "image": f"showcase/{p.name}"}
+#               for p in ctx.glob("showcase/*.png")]
+
 sections:
   about: |
     What the mod does, in a paragraph or two. Markdown works here.
@@ -109,6 +158,10 @@ sections:
   # configuration: |
   #   The config lives at `config/my-mod.json`.
 
+  # changelog:
+  #   elements: {from: releases}   # needs a `releases:` generator above
+  #   collapsed: true              # fold it away behind a summary line
+
   # faq:
   #   items:
   #     - q: Does it work on servers?
@@ -125,6 +178,13 @@ sections:
 #     after: features          # where it slots into the shared order
 #     body: |
 #       Measured on ...
+#   - id: support
+#     title: Supported versions
+#     after: about
+#     layout: table            # list | cards | table | gallery | slider |
+#                              # changelog | definition
+#     columns: [{field: version, title: Minecraft}, {field: description, title: Loaders}]
+#     elements: {from: support}
 
 # Per-target output paths (defaults shown).
 # outputs:

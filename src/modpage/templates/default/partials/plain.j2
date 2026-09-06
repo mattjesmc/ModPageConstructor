@@ -37,6 +37,36 @@
 {% endif %}
 {% endmacro %}
 
+{#- No HTML means no anchors, so the entries are plain text: the list still
+    tells a reader what the page holds, it just cannot jump them there. -#}
+{% macro contents() %}
+{% if toc %}
+
+---
+{% if toc.banner %}
+
+{{ img(toc.banner, toc.title or 'Contents') }}
+{% if toc.title and header.heading_with_banner %}
+
+### {{ toc.title }}
+{% endif %}
+{% elif toc.title %}
+
+## {{ toc.title }}
+{% endif %}
+{% if toc.style == 'inline' %}
+
+{% for entry in toc.entries %}{{ md.toc_entry(entry) }}{% if not loop.last %} • {% endif %}{% endfor %}
+
+{% else %}
+
+{% for entry in toc.entries %}
+{% if toc.numbered %}{{ loop.index }}.{% else %}-{% endif %} {{ md.toc_entry(entry) }}
+{% endfor %}
+{% endif %}
+{% endif %}
+{% endmacro %}
+
 {% macro page_header() %}
 {% if header.banner %}
 {{ img(header.banner, cfg.name) }}
@@ -126,6 +156,86 @@
 {% endif %}
 {% endmacro %}
 
+
+{#- Generated elements, with the HTML taken back out. The bullet list and the
+    pipe table in md.j2 are already pure Markdown and are reused as they are;
+    the layouts that lean on <table>, <sub> or <details> are rewritten here.
+    A slider cannot slide without HTML, so it reads as a captioned sequence. -#}
+
+{% macro elements_definition(items) %}
+{% for item in items %}
+
+**{% if item.url %}[{{ item.title }}]({{ item.url }}){% else %}{{ item.title }}{% endif %}**{{ ' · ' ~ item.date if item.date else '' }}
+
+{{ item.description or '' }}
+{% endfor %}
+{% endmacro %}
+
+{% macro elements_cards(items) %}
+{% for item in items %}
+{% if item.image or item.src %}
+
+{{ img(item.image or item.src, item.title or cfg.name) }}
+{% endif %}
+
+**{% if item.url %}[{{ item.title }}]({{ item.url }}){% else %}{{ item.title }}{% endif %}**{% if item.description %} — {{ item.description }}{% endif %}
+
+{% endfor %}
+{% endmacro %}
+
+{% macro elements_gallery(items) %}
+{% for item in items %}
+
+{{ img(item.image or item.src, item.alt or item.title or cfg.name) }}
+{% if item.caption or item.description %}
+
+*{{ item.caption or item.description }}*
+{% endif %}
+{% endfor %}
+{% endmacro %}
+
+{% macro changelog_release(release) %}
+
+**{% if release.url %}[{{ release.title }}]({{ release.url }}){% else %}{{ release.title }}{% endif %}**{% if release.date %} · {{ release.date }}{% endif %}
+
+{% if release.body %}
+{{ release.body }}
+{% endif %}
+{% for group in release['groups'] or [] %}
+{% if group.title %}
+
+*{{ group.title }}*
+{% endif %}
+
+{% for change in group['items'] %}
+- {{ change.title }}{{ ' ([`' ~ change.short ~ '`](' ~ change.url ~ '))' if change.url and change.short else '' }}
+{% endfor %}
+{% endfor %}
+{% if not release['groups'] and release.description %}
+
+{{ release.description }}
+{% endif %}
+{% endmacro %}
+
+{#- Nothing is folded: CurseForge's Markdown mode has no <details>. -#}
+{% macro elements(section) %}
+{% if section.layout == 'table' %}
+{{ md.elements_table(section) }}
+{% elif section.layout == 'changelog' %}
+{% for release in section.data['elements'] %}
+{{ changelog_release(release) }}
+{% endfor %}
+{% elif section.layout == 'cards' %}
+{{ elements_cards(section.data['elements']) }}
+{% elif section.layout in ('gallery', 'slider') %}
+{{ elements_gallery(section.data['elements']) }}
+{% elif section.layout == 'definition' %}
+{{ elements_definition(section.data['elements']) }}
+{% else %}
+{{ md.elements_list(section.data['elements']) }}
+{% endif %}
+{% endmacro %}
+
 {% macro section_body(section) %}
 {% if section.id == 'dependencies' %}
 {{ md.dependencies(section) }}
@@ -141,5 +251,8 @@
 {{ recipes(section) }}
 {% else %}
 {{ md.body(section) }}
+{% endif %}
+{% if section.data['elements'] %}
+{{ elements(section) }}
 {% endif %}
 {% endmacro %}

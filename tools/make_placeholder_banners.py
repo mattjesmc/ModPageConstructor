@@ -2,7 +2,7 @@
 
     python tools/make_placeholder_banners.py path/to/repo/assets/banners "Mod Name"
 
-Writes header.png plus one banner per canonical section. Replace them with real
+Writes header.png, contents.png and one banner per canonical section. Replace them with real
 art whenever you like -- the filenames are what modpage looks for.
 """
 
@@ -14,7 +14,7 @@ from pathlib import Path
 from PIL import Image, ImageDraw, ImageFont
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "src"))
-from modpage.config import CANONICAL_SECTIONS  # noqa: E402
+from modpage.config import CANONICAL_SECTIONS, TOC_ID, TOC_TITLE  # noqa: E402
 
 INK = (237, 233, 254)
 ACCENT = (167, 139, 250)
@@ -50,7 +50,7 @@ def main() -> int:
     out.mkdir(parents=True, exist_ok=True)
 
     _banner(out / "header.png", title, 1200, 340, 84)
-    for sid, section_title in CANONICAL_SECTIONS:
+    for sid, section_title in [(TOC_ID, TOC_TITLE), *CANONICAL_SECTIONS]:
         _banner(out / f"{sid}.png", section_title.upper(), 960, 120, 44)
     return 0
 

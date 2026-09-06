@@ -1,0 +1,39 @@
+# Regenerates README.md, dist/modrinth.md and dist/curseforge.md whenever the
+# main branch changes or a release tag is pushed, and commits the result.
+#
+# Written by `modpage init`. The pinned version below is the modpage release the
+# pages are built with; bump it deliberately, since a newer template may change
+# every page.
+name: Mod pages
+
+on:
+  push:
+    branches: [main]
+    tags: ["v*"]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: modpage-${{ github.repository }}
+  cancel-in-progress: false
+
+jobs:
+  pages:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          # Generators read tags and history; a shallow clone would see none.
+          fetch-depth: 0
+          # A tag push checks out a detached HEAD. Build on the default branch
+          # instead so the regenerated changelog has somewhere to be committed.
+          ref: ${{ github.event.repository.default_branch }}
+
+      - uses: {action_repo}@v{version}
+        # with:
+        #   config: modpage.yml
+        #   targets: readme modrinth curseforge
+        #   mode: commit          # or `check` to fail when pages are stale
+        #   commit-message: "docs: regenerate mod pages"

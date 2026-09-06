@@ -11,12 +11,47 @@
 
 {% macro section_header(section) %}
 {% if section.banner %}
-<p align="center"><img src="{{ asset(section.banner) }}" alt="{{ section.title }}"{% if header.section_banner_width %} width="{{ header.section_banner_width }}"{% endif %}></p>
+<p align="center"><a id="{{ section.id }}"></a><img src="{{ asset(section.banner) }}" alt="{{ section.title }}"{% if header.section_banner_width %} width="{{ header.section_banner_width }}"{% endif %}></p>
 {% if header.heading_with_banner %}
-<h2>{{ section.title }}</h2>
+<h2 id="{{ section.id }}-heading">{{ section.title }}</h2>
 {% endif %}
 {% else %}
-<h2>{{ section.title }}</h2>
+<h2 id="{{ section.id }}">{{ section.title }}</h2>
+{% endif %}
+{% endmacro %}
+
+{#- CurseForge's sanitiser may drop the ids these links point at; the list is
+    still worth having as an overview of the page. -#}
+{% macro contents() %}
+{% if toc %}
+<hr>
+{% if toc.banner %}
+<p align="center"><a id="{{ toc.id }}"></a><img src="{{ asset(toc.banner) }}" alt="{{ toc.title or 'Contents' }}"{% if header.section_banner_width %} width="{{ header.section_banner_width }}"{% endif %}></p>
+{% if toc.title and header.heading_with_banner %}
+<h2>{{ toc.title }}</h2>
+{% endif %}
+{% elif toc.title %}
+<h2 id="{{ toc.id }}">{{ toc.title }}</h2>
+{% endif %}
+{% if toc.style == 'inline' %}
+<p align="center">
+{% for entry in toc.entries %}<a href="#{{ entry.id }}">{{ entry.title | e }}</a>{% if not loop.last %} &bull; {% endif %}{% endfor %}
+</p>
+{% else %}
+{% if toc.numbered %}
+<ol>
+{% else %}
+<ul>
+{% endif %}
+{% for entry in toc.entries %}
+<li><a href="#{{ entry.id }}">{{ entry.title | e }}</a></li>
+{% endfor %}
+{% if toc.numbered %}
+</ol>
+{% else %}
+</ul>
+{% endif %}
+{% endif %}
 {% endif %}
 {% endmacro %}
 
@@ -149,6 +184,103 @@
 {% endif %}
 {% endmacro %}
 
+
+{#- Generated elements, in the tags CurseForge's sanitiser keeps. No <details>
+    here either, so a collapsed section is simply shown in full. -#}
+
+{%- macro element_title(item) -%}
+{% if item.url %}<a href="{{ item.url }}">{{ item.title | e }}</a>{% else %}{{ item.title | e }}{% endif %}
+{%- endmacro -%}
+
+{% macro elements_list(items) %}
+<ul>
+{% for item in items %}
+<li><strong>{{ element_title(item) }}</strong>{% if item.description %} &mdash; {{ item.description | inline_md }}{% endif %}
+{% if item['items'] %}
+<ul>
+{% for child in item['items'] %}
+<li><strong>{{ element_title(child) }}</strong>{% if child.description %} &mdash; {{ child.description | inline_md }}{% endif %}</li>
+{% endfor %}
+</ul>
+{% endif %}
+</li>
+{% endfor %}
+</ul>
+{% endmacro %}
+
+{% macro elements_definition(items) %}
+{% for item in items %}
+<p><strong>{{ element_title(item) }}</strong>{% if item.date %} <sub>{{ item.date }}</sub>{% endif %}{% if item.description %}<br>{{ item.description | inline_md }}{% endif %}</p>
+{% endfor %}
+{% endmacro %}
+
+{% macro elements_cards(items) %}
+{% for item in items %}
+{% if item.image or item.src %}
+<p align="center"><img src="{{ asset(item.image or item.src) }}" alt="{{ item.title | e }}"></p>
+{% endif %}
+<p><strong>{{ element_title(item) }}</strong>{% if item.description %}<br>{{ item.description | inline_md }}{% endif %}</p>
+{% endfor %}
+{% endmacro %}
+
+{% macro elements_gallery(items) %}
+{% for item in items %}
+<p align="center"><img src="{{ asset(item.image or item.src) }}" alt="{{ item.alt or item.title or cfg.name }}"{% if item.width %} width="{{ item.width }}"{% endif %}>
+{% if item.caption or item.description %}
+<br><sub><em>{{ (item.caption or item.description) | e }}</em></sub>
+{% endif %}
+</p>
+{% endfor %}
+{% endmacro %}
+
+{% macro elements_table(section) %}
+{% set columns = section.data['columns'] %}
+<table>
+<tr>{% for column in columns %}<th>{{ column.title | e }}</th>{% endfor %}</tr>
+{% for item in section.data['elements'] %}
+<tr>{% for column in columns %}<td>{{ item[column.field] if item[column.field] is not none else '' }}</td>{% endfor %}</tr>
+{% endfor %}
+</table>
+{% endmacro %}
+
+{% macro changelog_release(release) %}
+<p><strong>{{ element_title(release) }}</strong>{% if release.date %} <sub>{{ release.date }}</sub>{% endif %}</p>
+{% if release.body %}
+{{ release.body | md }}
+{% endif %}
+{% for group in release['groups'] or [] %}
+{% if group.title %}
+<p><em>{{ group.title | e }}</em></p>
+{% endif %}
+<ul>
+{% for change in group['items'] %}
+<li>{{ change.title | e }}{% if change.url and change.short %} (<a href="{{ change.url }}"><code>{{ change.short }}</code></a>){% endif %}</li>
+{% endfor %}
+</ul>
+{% endfor %}
+{% if not release['groups'] and release.description %}
+{{ release.description | md }}
+{% endif %}
+{% endmacro %}
+
+{% macro elements(section) %}
+{% if section.layout == 'table' %}
+{{ elements_table(section) }}
+{% elif section.layout == 'changelog' %}
+{% for release in section.data['elements'] %}
+{{ changelog_release(release) }}
+{% endfor %}
+{% elif section.layout == 'cards' %}
+{{ elements_cards(section.data['elements']) }}
+{% elif section.layout in ('gallery', 'slider') %}
+{{ elements_gallery(section.data['elements']) }}
+{% elif section.layout == 'definition' %}
+{{ elements_definition(section.data['elements']) }}
+{% else %}
+{{ elements_list(section.data['elements']) }}
+{% endif %}
+{% endmacro %}
+
 {% macro section_body(section) %}
 {% if section.id == 'dependencies' %}
 {{ dependencies(section) }}
@@ -164,6 +296,9 @@
 {{ recipes(section) }}
 {% else %}
 {{ body(section) }}
+{% endif %}
+{% if section.data['elements'] %}
+{{ elements(section) }}
 {% endif %}
 {% endmacro %}
 

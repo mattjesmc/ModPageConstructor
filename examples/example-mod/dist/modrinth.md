@@ -18,6 +18,24 @@
 </p>
 
 ---
+<a id="contents"></a>
+
+## Contents
+
+- [About](#about)
+- [Supported versions](#support)
+- [Features](#features)
+- [Gallery](#gallery)
+- [Recipes](#recipes)
+- [Dependencies](#dependencies)
+- [Incompatibilities](#incompatibilities)
+- [Installation](#installation)
+- [Configuration](#configuration)
+- [Changelog](#changelog)
+- [FAQ](#faq)
+- [Credits](#credits)
+
+---
 <a id="about"></a>
 <p align="center">
   <img src="https://raw.githubusercontent.com/Matthijs/lantern-lights/main/assets/banners/about.png" alt="About" width="480">
@@ -28,6 +46,17 @@ follows the block it is attached to, so corridors, mineshafts and boats stay
 lit without a single command block.
 
 It is a drop-in change: no new items, no world data, nothing to migrate.
+
+---
+<a id="support"></a>
+<p align="center">
+  <img src="https://raw.githubusercontent.com/Matthijs/lantern-lights/main/assets/banners/support.png" alt="Supported versions" width="480">
+</p>
+
+| Minecraft | Loaders |
+| --- | --- |
+| 1.21.1 | Fabric, NeoForge |
+| 1.20.1 | Fabric, NeoForge |
 
 ---
 <a id="features"></a>
@@ -125,6 +154,47 @@ The config lives at `config/lantern-lights.json`:
 | --- | --- | --- |
 | `radius` | `12` | Light radius in blocks |
 | `smooth` | `true` | Fade light in and out |
+
+---
+<a id="changelog"></a>
+<p align="center">
+  <img src="https://raw.githubusercontent.com/Matthijs/lantern-lights/main/assets/banners/changelog.png" alt="Changelog" width="480">
+</p>
+
+Generated from `CHANGELOG.md` at build time -- write the entry once, and
+all three pages carry it.
+
+<details>
+<summary><b>What changed in the last three releases</b></summary>
+
+**1.2.0** · <sub>2026-08-14</sub>
+
+*Added*
+
+- Copper lanterns, and a recipe to cut them from blocks
+- `radius` is now per-dimension
+
+*Fixed*
+
+- Lanterns held in the offhand no longer flicker at chunk borders
+
+**1.1.0** · <sub>2026-06-02</sub>
+
+*Added*
+
+- Glow lanterns craft from any plank
+
+*Changed*
+
+- Rewrote the light propagation loop; roughly 4x faster on large caves
+
+**1.0.0** · <sub>2026-04-20</sub>
+
+*Added*
+
+- First release
+
+</details>
 
 ---
 <a id="faq"></a>

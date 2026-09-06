@@ -8,10 +8,14 @@ import sys
 from pathlib import Path
 
 from . import config as config_mod
+from . import generators as generators_mod
 from . import render as render_mod
 from .config import CANONICAL_SECTIONS, ConfigError
 
 SCAFFOLD = Path(__file__).parent / "scaffold" / "modpage.yml"
+WORKFLOW_SCAFFOLD = Path(__file__).parent / "scaffold" / "workflow.yml"
+#: The GitHub repository the composite action is published from, as `uses:` wants it.
+ACTION_REPO = "mattjesmc/ModPageConstructor"
 
 GREEN, YELLOW, RED, DIM, RESET = "\033[32m", "\033[33m", "\033[31m", "\033[2m", "\033[0m"
 
@@ -26,7 +30,10 @@ def _paint(text: str, colour: str) -> str:
 
 def _load(args: argparse.Namespace) -> config_mod.Config:
     path = Path(args.config).resolve() if args.config else config_mod.default_config_path()
-    return config_mod.load(path)
+    cfg = config_mod.load(path, run_generators=not getattr(args, "no_generators", False))
+    for warning in cfg.warnings:
+        print(_paint(f"  warning: {warning}", YELLOW))
+    return cfg
 
 
 def _resolve_targets(requested: list[str] | None) -> list[str]:
@@ -128,6 +135,51 @@ def cmd_recipes(args: argparse.Namespace) -> int:
     return 0
 
 
+def cmd_generators(args: argparse.Namespace) -> int:
+    """List the generators available here, and preview what this repo's produce."""
+    from . import generators as gen_mod
+
+    registry = gen_mod.registry()
+    print("Available generators:")
+    print()
+    for name in sorted(registry):
+        print(f"  {name:<20} {_paint(gen_mod.describe(name), DIM)}")
+
+    path = Path(args.config).resolve() if args.config else config_mod.default_config_path()
+    if not path.is_file():
+        print()
+        print(_paint(f"(no {path.name} here, so nothing is declared yet)", DIM))
+        return 0
+
+    cfg = _load(args)
+    if not cfg.generated:
+        print()
+        print(_paint("This repo declares none. Add a 'generators:' block to "
+                     f"{path.name} and reference it with 'from:'.", DIM))
+        return 0
+
+    print()
+    print(f"Declared in {path.name}:")
+    print()
+    declarations = cfg.raw.get("generators") or {}
+    for name, elements in cfg.generated.items():
+        spec = declarations.get(name) or {}
+        use = spec.get("use") if isinstance(spec, dict) else spec
+        count = _paint(f"{len(elements)} element(s)", GREEN if elements else YELLOW)
+        print(f"  {name}  {_paint('via ' + str(use), DIM)}  -> {count}")
+        for element in elements[: args.limit]:
+            if isinstance(element, dict):
+                label = (element.get("title") or element.get("name")
+                         or element.get("version") or element.get("src") or "")
+                keys = ", ".join(sorted(element)[:8])
+                print(f"      - {str(label)[:52]:<52} {_paint(keys, DIM)}")
+            else:
+                print(f"      - {element}")
+        if len(elements) > args.limit:
+            print(_paint(f"      ... and {len(elements) - args.limit} more", DIM))
+    return 0
+
+
 def cmd_init(args: argparse.Namespace) -> int:
     root = Path(args.dir).resolve()
     target = root / "modpage.yml"
@@ -150,6 +202,15 @@ def cmd_init(args: argparse.Namespace) -> int:
     modpage_dir.mkdir(exist_ok=True)
     (modpage_dir / ".gitignore").write_text("cache/\n", encoding="utf-8")
 
+    if not args.no_workflow:
+        workflow = root / ".github" / "workflows" / "modpage.yml"
+        if workflow.exists():
+            print(_paint(f"kept:   {workflow} (already present)", DIM))
+        else:
+            workflow.parent.mkdir(parents=True, exist_ok=True)
+            workflow.write_text(workflow_text(), encoding="utf-8", newline="\n")
+            print(_paint(f"wrote:  {workflow}", GREEN))
+
     banner_names = ", ".join(f"{sid}.png" for sid, _ in CANONICAL_SECTIONS)
     print(
         "\nDrop a header banner at assets/banners/header.png, and section banners named:\n"
@@ -158,6 +219,15 @@ def cmd_init(args: argparse.Namespace) -> int:
         "Then run: modpage build"
     )
     return 0
+
+
+def workflow_text() -> str:
+    """The GitHub Actions workflow ``init`` drops into a mod repo, pinned to this release."""
+    from . import __version__
+
+    return (WORKFLOW_SCAFFOLD.read_text(encoding="utf-8")
+            .replace("{action_repo}", ACTION_REPO)
+            .replace("{version}", __version__))
 
 
 def cmd_sections(args: argparse.Namespace) -> int:
@@ -171,7 +241,9 @@ def cmd_sections(args: argparse.Namespace) -> int:
         print(f"  {sid:<18} {title}{marker}")
     print(
         "\nA section is skipped when it has no content, except the always-rendered ones,\n"
-        "which fall back to their empty_text. Add your own with 'custom_sections'."
+        "which fall back to their empty_text. Add your own with 'custom_sections'.\n"
+        "Any section can carry 'elements:' -- usually a generator's output -- drawn\n"
+        f"by its 'layout:' ({', '.join(config_mod.LAYOUTS)}). See 'modpage generators'."
     )
     return 0
 
@@ -199,6 +271,8 @@ def build_parser() -> argparse.ArgumentParser:
                        help="skip re-rendering recipe images")
     build.add_argument("--offline", action="store_true",
                        help="never fetch vanilla textures or tags; use the cache only")
+    build.add_argument("--no-generators", action="store_true",
+                       help="leave every generated list empty (skips git and file scans)")
     build.set_defaults(func=cmd_build)
 
     recipes = sub.add_parser("recipes", help="render just the recipe images")
@@ -208,9 +282,18 @@ def build_parser() -> argparse.ArgumentParser:
                          help="never fetch vanilla textures or tags; use the cache only")
     recipes.set_defaults(func=cmd_recipes)
 
+    gens = sub.add_parser("generators",
+                          help="list the element generators and preview what they produce")
+    gens.add_argument("-c", "--config", help="path to modpage.yml (default: ./modpage.yml)")
+    gens.add_argument("-n", "--limit", type=int, default=5,
+                      help="how many elements to preview per generator (default: 5)")
+    gens.set_defaults(func=cmd_generators)
+
     init = sub.add_parser("init", help="scaffold modpage.yml and the assets folders")
     init.add_argument("dir", nargs="?", default=".", help="repo root (default: .)")
     init.add_argument("--force", action="store_true", help="overwrite an existing modpage.yml")
+    init.add_argument("--no-workflow", action="store_true",
+                      help="do not write the GitHub Actions workflow that rebuilds the pages")
     init.set_defaults(func=cmd_init)
 
     sections = sub.add_parser("sections", help="list the shared section skeleton")
@@ -224,6 +307,9 @@ def main(argv: list[str] | None = None) -> int:
     try:
         return args.func(args)
     except ConfigError as error:
+        print(_paint(f"error: {error}", RED), file=sys.stderr)
+        return 2
+    except generators_mod.GeneratorError as error:
         print(_paint(f"error: {error}", RED), file=sys.stderr)
         return 2
 

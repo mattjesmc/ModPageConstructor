@@ -11,7 +11,8 @@ from typing import Any
 import markdown as markdown_lib
 from jinja2 import ChoiceLoader, Environment, FileSystemLoader, Undefined
 
-from .config import Config, ConfigError
+from . import generators
+from .config import Config, ConfigError, Section
 
 TEMPLATE_DIR = Path(__file__).parent / "templates"
 
@@ -23,6 +24,9 @@ class Target:
     platform: str
     html: bool = False
     absolute_urls: bool = False
+    #: Whether in-page links work here. Anchors need an ``id`` attribute, so a
+    #: target that renders no HTML at all gets an unlinked contents list.
+    anchors: bool = True
     #: Rendered by a bare ``modpage build``; opt-in targets need ``-t``.
     default: bool = True
 
@@ -32,7 +36,7 @@ TARGETS: dict[str, Target] = {
     "modrinth": Target("modrinth.md.j2", "modrinth", absolute_urls=True),
     # CurseForge's editor offers WYSIWYG or Markdown, nothing else, and its
     # Markdown mode escapes raw HTML -- so the page it gets is HTML-free Markdown.
-    "curseforge": Target("curseforge.md.j2", "curseforge", absolute_urls=True),
+    "curseforge": Target("curseforge.md.j2", "curseforge", absolute_urls=True, anchors=False),
     # Opt in: the same page as HTML, for opening in a browser and copying the
     # rendered result into the WYSIWYG editor. Pasting the source does not work.
     "curseforge-html": Target("curseforge.html.j2", "curseforge",
@@ -83,6 +87,10 @@ def _make_environment(config: Config) -> Environment:
     )
     env.filters["md"] = _md_to_html
     env.filters["inline_md"] = lambda text: re.sub(r"</?p>", "", _md_to_html(text)).strip()
+    # Generated elements carry ISO dates and raw ids; give templates the same
+    # two filters the generator pipeline uses to tidy them.
+    env.filters["date"] = generators.fmt_date
+    env.filters["slug"] = generators.slugify
     return env
 
 
@@ -128,6 +136,27 @@ def _asset_resolver(config: Config, target: str, out_path: Path, warnings: list[
     return asset
 
 
+def _toc_context(config: Config, target: str,
+                 sections: list[Section]) -> dict[str, Any] | None:
+    """The contents list for one target, or ``None`` when it should be left out."""
+    toc = config.toc
+    if not toc:
+        return None
+    spec = TARGETS[target]
+    if toc["targets"] is not None and not {target, spec.platform} & set(toc["targets"]):
+        return None
+
+    entries = [
+        {"id": section.id, "title": section.title,
+         "anchor": section.id if spec.anchors else None}
+        for section in sections if section.id not in toc["skip"]
+    ]
+    # A contents list over one or two sections is noise, not navigation.
+    if len(entries) < toc["min_sections"]:
+        return None
+    return {**toc, "entries": entries}
+
+
 def render_target(config: Config, target: str) -> Rendered:
     if target not in TARGETS:
         raise ConfigError(f"unknown target '{target}'. Known: {', '.join(TARGETS)}")
@@ -145,6 +174,8 @@ def render_target(config: Config, target: str) -> Rendered:
     env.globals["asset"] = _asset_resolver(config, target, out_path, warnings)
     template = env.get_template(f"{config.template}/{spec.template}")
 
+    visible = [s for s in config.sections
+               if s.targets is None or target in s.targets or spec.platform in s.targets]
     context: dict[str, Any] = {
         "cfg": config,
         "partials": f"{config.template}/partials",
@@ -152,13 +183,16 @@ def render_target(config: Config, target: str) -> Rendered:
         "target": target,
         "platform": spec.platform,
         "is_html": spec.html,
-        "sections": [s for s in config.sections
-                     if s.targets is None or target in s.targets or spec.platform in s.targets],
+        "sections": visible,
+        "toc": _toc_context(config, target, visible),
         "header": config.header,
         "badges": config.badges,
         "links": config.links,
         "minecraft": config.minecraft,
         "extra": config.raw.get("extra", {}),
+        # Every declared generator's elements, whether or not a section uses
+        # them -- a custom template can lay them out however it likes.
+        "gen": config.generated,
     }
     return Rendered(target, out_path, _tidy(template.render(**context)), warnings)
 

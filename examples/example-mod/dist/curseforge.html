@@ -26,7 +26,24 @@
 <a href="https://github.com/Matthijs/lantern-lights">GitHub</a> &bull; <a href="https://modrinth.com/mod/lantern-lights">Modrinth</a> &bull; <a href="https://www.curseforge.com/minecraft/mc-mods/lantern-lights">CurseForge</a> &bull; <a href="https://github.com/Matthijs/lantern-lights/issues">Issues</a></p>
 
 <hr>
-<p align="center"><img src="https://raw.githubusercontent.com/Matthijs/lantern-lights/main/assets/banners/about.png" alt="About" width="480"></p>
+<h2 id="contents">Contents</h2>
+<ul>
+<li><a href="#about">About</a></li>
+<li><a href="#support">Supported versions</a></li>
+<li><a href="#features">Features</a></li>
+<li><a href="#gallery">Gallery</a></li>
+<li><a href="#recipes">Recipes</a></li>
+<li><a href="#dependencies">Dependencies</a></li>
+<li><a href="#incompatibilities">Incompatibilities</a></li>
+<li><a href="#installation">Installation</a></li>
+<li><a href="#configuration">Configuration</a></li>
+<li><a href="#changelog">Changelog</a></li>
+<li><a href="#faq">FAQ</a></li>
+<li><a href="#credits">Credits</a></li>
+</ul>
+
+<hr>
+<p align="center"><a id="about"></a><img src="https://raw.githubusercontent.com/Matthijs/lantern-lights/main/assets/banners/about.png" alt="About" width="480"></p>
 
 <p>Lantern Lights replaces the vanilla lantern with a dynamic light source that
 follows the block it is attached to, so corridors, mineshafts and boats stay
@@ -34,7 +51,16 @@ lit without a single command block.</p>
 <p>It is a drop-in change: no new items, no world data, nothing to migrate.</p>
 
 <hr>
-<p align="center"><img src="https://raw.githubusercontent.com/Matthijs/lantern-lights/main/assets/banners/features.png" alt="Features" width="480"></p>
+<p align="center"><a id="support"></a><img src="https://raw.githubusercontent.com/Matthijs/lantern-lights/main/assets/banners/support.png" alt="Supported versions" width="480"></p>
+
+<table>
+<tr><th>Minecraft</th><th>Loaders</th></tr>
+<tr><td>1.21.1</td><td>Fabric, NeoForge</td></tr>
+<tr><td>1.20.1</td><td>Fabric, NeoForge</td></tr>
+</table>
+
+<hr>
+<p align="center"><a id="features"></a><img src="https://raw.githubusercontent.com/Matthijs/lantern-lights/main/assets/banners/features.png" alt="Features" width="480"></p>
 
 <ul>
 <li><strong>Dynamic lighting</strong> &mdash; Lanterns emit light along the path they are carried.</li>
@@ -43,14 +69,14 @@ lit without a single command block.</p>
 </ul>
 
 <hr>
-<p align="center"><img src="https://raw.githubusercontent.com/Matthijs/lantern-lights/main/assets/banners/gallery.png" alt="Gallery" width="480"></p>
+<p align="center"><a id="gallery"></a><img src="https://raw.githubusercontent.com/Matthijs/lantern-lights/main/assets/banners/gallery.png" alt="Gallery" width="480"></p>
 
 <p align="center"><img src="https://raw.githubusercontent.com/Matthijs/lantern-lights/main/assets/gallery/overview.png" alt="A lit mineshaft, no torches placed">
 <br><sub><em>A lit mineshaft, no torches placed</em></sub>
 </p>
 
 <hr>
-<p align="center"><img src="https://raw.githubusercontent.com/Matthijs/lantern-lights/main/assets/banners/recipes.png" alt="Recipes" width="480"></p>
+<p align="center"><a id="recipes"></a><img src="https://raw.githubusercontent.com/Matthijs/lantern-lights/main/assets/banners/recipes.png" alt="Recipes" width="480"></p>
 
 <p>Every recipe below is generated straight from the mod&rsquo;s data files.</p>
 
@@ -67,7 +93,7 @@ lit without a single command block.</p>
 </table>
 
 <hr>
-<p align="center"><img src="https://raw.githubusercontent.com/Matthijs/lantern-lights/main/assets/banners/dependencies.png" alt="Dependencies" width="480"></p>
+<p align="center"><a id="dependencies"></a><img src="https://raw.githubusercontent.com/Matthijs/lantern-lights/main/assets/banners/dependencies.png" alt="Dependencies" width="480"></p>
 
 <p><strong>Required</strong></p>
 <table>
@@ -82,7 +108,7 @@ lit without a single command block.</p>
 </table>
 
 <hr>
-<p align="center"><img src="https://raw.githubusercontent.com/Matthijs/lantern-lights/main/assets/banners/incompatibilities.png" alt="Incompatibilities" width="480"></p>
+<p align="center"><a id="incompatibilities"></a><img src="https://raw.githubusercontent.com/Matthijs/lantern-lights/main/assets/banners/incompatibilities.png" alt="Incompatibilities" width="480"></p>
 
 <table>
 <tr><th>Mod</th><th>Conflict</th><th>Workaround</th></tr>
@@ -90,7 +116,7 @@ lit without a single command block.</p>
 </table>
 
 <hr>
-<p align="center"><img src="https://raw.githubusercontent.com/Matthijs/lantern-lights/main/assets/banners/installation.png" alt="Installation" width="480"></p>
+<p align="center"><a id="installation"></a><img src="https://raw.githubusercontent.com/Matthijs/lantern-lights/main/assets/banners/installation.png" alt="Installation" width="480"></p>
 
 <ol>
 <li>Install <a href="https://fabricmc.net/use/">Fabric Loader</a> or NeoForge.</li>
@@ -99,7 +125,7 @@ lit without a single command block.</p>
 </ol>
 
 <hr>
-<p align="center"><img src="https://raw.githubusercontent.com/Matthijs/lantern-lights/main/assets/banners/configuration.png" alt="Configuration" width="480"></p>
+<p align="center"><a id="configuration"></a><img src="https://raw.githubusercontent.com/Matthijs/lantern-lights/main/assets/banners/configuration.png" alt="Configuration" width="480"></p>
 
 <p>The config lives at <code>config/lantern-lights.json</code>:</p>
 <table>
@@ -125,18 +151,51 @@ lit without a single command block.</p>
 </table>
 
 <hr>
-<p align="center"><img src="https://raw.githubusercontent.com/Matthijs/lantern-lights/main/assets/banners/faq.png" alt="FAQ" width="480"></p>
+<p align="center"><a id="changelog"></a><img src="https://raw.githubusercontent.com/Matthijs/lantern-lights/main/assets/banners/changelog.png" alt="Changelog" width="480"></p>
+
+<p>Generated from <code>CHANGELOG.md</code> at build time &ndash; write the entry once, and
+all three pages carry it.</p>
+
+<p><strong>1.2.0</strong> <sub>2026-08-14</sub></p>
+<p><em>Added</em></p>
+<ul>
+<li>Copper lanterns, and a recipe to cut them from blocks</li>
+<li>`radius` is now per-dimension</li>
+</ul>
+<p><em>Fixed</em></p>
+<ul>
+<li>Lanterns held in the offhand no longer flicker at chunk borders</li>
+</ul>
+
+<p><strong>1.1.0</strong> <sub>2026-06-02</sub></p>
+<p><em>Added</em></p>
+<ul>
+<li>Glow lanterns craft from any plank</li>
+</ul>
+<p><em>Changed</em></p>
+<ul>
+<li>Rewrote the light propagation loop; roughly 4x faster on large caves</li>
+</ul>
+
+<p><strong>1.0.0</strong> <sub>2026-04-20</sub></p>
+<p><em>Added</em></p>
+<ul>
+<li>First release</li>
+</ul>
+
+<hr>
+<p align="center"><a id="faq"></a><img src="https://raw.githubusercontent.com/Matthijs/lantern-lights/main/assets/banners/faq.png" alt="FAQ" width="480"></p>
 
 <p><strong>Does it work on a server?</strong><br>Yes. Install it on both sides for the full effect.</p>
 <p><strong>Does it break shaders?</strong><br>No, it uses the vanilla light engine.</p>
 
 <hr>
-<p align="center"><img src="https://raw.githubusercontent.com/Matthijs/lantern-lights/main/assets/banners/credits.png" alt="Credits" width="480"></p>
+<p align="center"><a id="credits"></a><img src="https://raw.githubusercontent.com/Matthijs/lantern-lights/main/assets/banners/credits.png" alt="Credits" width="480"></p>
 
 <p>Textures by <strong>@someone</strong>. Thanks to the Fabric community for the light engine notes.</p>
 
 <hr>
-<p align="center"><img src="https://raw.githubusercontent.com/Matthijs/lantern-lights/main/assets/banners/license.png" alt="License" width="480"></p>
+<p align="center"><a id="license"></a><img src="https://raw.githubusercontent.com/Matthijs/lantern-lights/main/assets/banners/license.png" alt="License" width="480"></p>
 
 <p>Released under the <strong>MIT</strong> license.</p>
 

@@ -9,6 +9,8 @@ from typing import Any
 
 import yaml
 
+from . import generators as generators_mod
+
 # Every page shares the same skeleton. Sections listed here render in this order;
 # the ones in ALWAYS_RENDER appear on every page even when empty, so that
 # "Dependencies" and "Incompatibilities" are a guaranteed banner + answer rather
@@ -22,6 +24,7 @@ CANONICAL_SECTIONS: list[tuple[str, str]] = [
     ("incompatibilities", "Incompatibilities"),
     ("installation", "Installation"),
     ("configuration", "Configuration"),
+    ("changelog", "Changelog"),
     ("faq", "FAQ"),
     ("credits", "Credits"),
     ("license", "License"),
@@ -31,7 +34,26 @@ ALWAYS_RENDER = {"dependencies", "incompatibilities"}
 # own -- the content is discovered from the repo at build time.
 OPT_IN_SECTIONS = {"recipes"}
 
+# The contents list is not a section -- it has no body and is not reorderable --
+# but it borrows the section conventions: an id, a title, and an auto-discovered
+# banner at assets/banners/contents.png.
+TOC_ID = "contents"
+TOC_TITLE = "Contents"
+TOC_STYLES = ("list", "inline")
+
 BANNER_EXTS = (".png", ".webp", ".jpg", ".jpeg", ".gif", ".svg")
+
+# How a section renders a list of generated elements. Every target understands
+# all of them; `slider` is a gallery everywhere Markdown is all there is.
+LAYOUTS = ("list", "cards", "table", "gallery", "slider", "changelog", "definition")
+DEFAULT_LAYOUTS = {"changelog": "changelog", "gallery": "gallery"}
+# Keys a section understands itself; everything else it carries is passed to the
+# layout as `section.options` (table columns, image widths, fold thresholds).
+SECTION_KEYS = frozenset({
+    "id", "title", "banner", "body", "targets", "empty_text", "always", "after",
+    "layout", "elements", "entries", "items", "images", "required", "optional",
+    "bundled", "known",
+})
 
 # Display names for the link row; anything unlisted is title-cased.
 LINK_LABELS = {
@@ -132,6 +154,62 @@ def _normalise_faq(entries: Any) -> list[dict[str, str]]:
     return out
 
 
+def _normalise_columns(spec: Any) -> list[dict[str, str]]:
+    """``columns: [version, date]`` or ``[{field: date, title: Shipped}]``."""
+    columns: list[dict[str, str]] = []
+    for entry in _as_list(spec):
+        if isinstance(entry, str):
+            columns.append({"field": entry, "title": entry.replace("_", " ").title()})
+        elif isinstance(entry, dict):
+            name = entry.get("field") or entry.get("key") or entry.get("name")
+            if not name:
+                raise ConfigError(f"table column {entry!r} needs a 'field'")
+            columns.append({
+                "field": str(name),
+                "title": str(entry.get("title") or str(name).replace("_", " ").title()),
+            })
+        else:
+            raise ConfigError(f"unsupported table column: {entry!r}")
+    return columns or [{"field": "title", "title": "Name"},
+                       {"field": "description", "title": "Details"}]
+
+
+def _normalise_elements(entries: Any) -> list[dict[str, Any]]:
+    """Elements are whatever a generator produced; give them the keys templates read.
+
+    A generator is free to name its fields after its own subject -- a tag has a
+    ``version``, a commit has a ``subject`` -- so the conventional ``title`` and
+    ``description`` are filled in from whichever of those is present rather than
+    demanded of every generator.
+    """
+    out: list[dict[str, Any]] = []
+    for entry in _as_list(entries):
+        if isinstance(entry, str):
+            out.append({"title": entry, "description": None})
+            continue
+        if not isinstance(entry, dict):
+            raise ConfigError(f"element {entry!r} must be a mapping or a string")
+        item = dict(entry)
+        for key, sources in (("title", ("name", "version", "question", "heading")),
+                             ("description", ("body", "summary", "subject", "answer",
+                                              "caption", "note"))):
+            if not item.get(key):
+                for source in sources:
+                    if item.get(source):
+                        item[key] = item[source]
+                        break
+        item.setdefault("title", None)
+        item.setdefault("description", None)
+        if not any((item.get("title"), item.get("description"), item.get("image"),
+                    item.get("src"), item.get("items"))):
+            raise ConfigError(
+                f"element {entry!r} has nothing to show -- give it a title, a "
+                "description, an image, or nested items"
+            )
+        out.append(item)
+    return out
+
+
 @dataclass
 class Section:
     id: str
@@ -141,6 +219,10 @@ class Section:
     data: dict[str, Any] = field(default_factory=dict)
     empty_text: str | None = None
     targets: list[str] | None = None  # None = every target
+    #: How ``data['elements']`` is drawn; see :data:`LAYOUTS`.
+    layout: str = "list"
+    #: Extra per-section settings a layout reads (table columns, image widths).
+    options: dict[str, Any] = field(default_factory=dict)
 
     @property
     def is_empty(self) -> bool:
@@ -165,6 +247,14 @@ class Config:
     outputs: dict[str, str]
     template: str
     footer: str | None
+    #: ``None`` when the config asks for no contents list.
+    toc: dict[str, Any] | None
+    #: Every declared generator's elements, keyed by name, for templates that
+    #: want a list the shared skeleton has no section for.
+    generated: dict[str, list[Any]] = field(default_factory=dict)
+    #: Warnings raised while loading (a generator that found nothing, say);
+    #: the CLI prints these alongside the per-target render warnings.
+    warnings: list[str] = field(default_factory=list)
 
     @property
     def link_items(self) -> list[dict[str, str]]:
@@ -272,6 +362,42 @@ def _build_badges(raw: dict[str, Any], links: dict[str, str], minecraft: dict[st
     return badges
 
 
+def _build_toc(raw: dict[str, Any], root: Path, assets_dir: str,
+               banner_dir: str) -> dict[str, Any] | None:
+    """Normalise the optional ``toc:`` block; ``None`` means "no contents list"."""
+    cfg = raw.get("toc")
+    if cfg is None or cfg is False:
+        return None
+    if cfg is True:
+        cfg = {}
+    elif isinstance(cfg, str):  # `toc: Jump to` shorthand
+        cfg = {"title": cfg}
+    if not isinstance(cfg, dict):
+        raise ConfigError("'toc' must be true, false, a title string, or a mapping")
+
+    style = str(cfg.get("style", "list")).lower()
+    if style not in TOC_STYLES:
+        raise ConfigError(f"toc.style must be one of {', '.join(TOC_STYLES)}, got '{style}'")
+
+    sid = str(cfg.get("id") or TOC_ID)
+    title = cfg.get("title", TOC_TITLE)
+    try:
+        min_sections = int(cfg.get("min_sections", 2))
+    except (TypeError, ValueError):
+        raise ConfigError(f"toc.min_sections must be a number, got {cfg['min_sections']!r}") from None
+
+    return {
+        "id": sid,
+        "title": None if title is None or title is False else str(title),
+        "style": style,
+        "numbered": bool(cfg.get("numbered", False)),
+        "banner": cfg.get("banner") or _find_banner(root, assets_dir, banner_dir, sid),
+        "skip": [str(entry) for entry in _as_list(cfg.get("skip"))],
+        "min_sections": min_sections,
+        "targets": [str(t) for t in _as_list(cfg["targets"])] if cfg.get("targets") else None,
+    }
+
+
 def _build_sections(raw: dict[str, Any], root: Path, assets_dir: str, banner_dir: str,
                     license_name: str | None) -> list[Section]:
     declared = raw.get("sections") or {}
@@ -343,6 +469,24 @@ def _build_sections(raw: dict[str, Any], root: Path, assets_dir: str, banner_dir
             data = {"images": [], "options": {k: v for k, v in cfg.items()
                                               if k not in ("title", "banner", "body")}}
 
+        # Any section may carry a list of elements -- usually a generator's
+        # output, spliced in by `elements: {from: <generator>}` -- drawn by the
+        # layout rather than by a macro written for that one section.
+        elements = cfg.get("elements", cfg.get("entries"))
+        if elements is not None:
+            data["elements"] = _normalise_elements(elements)
+        layout = str(cfg.get("layout") or DEFAULT_LAYOUTS.get(sid, "list")).lower()
+        if layout not in LAYOUTS:
+            raise ConfigError(
+                f"section '{sid}': layout must be one of {', '.join(LAYOUTS)}, got '{layout}'"
+            )
+        if layout == "table":
+            columns = _normalise_columns(cfg.get("columns"))
+            # Headings alone are not content; without rows the section is empty
+            # and is skipped like any other, rather than drawing a bare header.
+            if data.get("elements"):
+                data["columns"] = columns
+
         body = cfg.get("body")
         if sid == "license" and not body and license_name:
             body = f"Released under the **{license_name}** license."
@@ -355,6 +499,8 @@ def _build_sections(raw: dict[str, Any], root: Path, assets_dir: str, banner_dir
             data=data,
             empty_text=cfg.get("empty_text") or DEFAULT_EMPTY_TEXT.get(sid),
             targets=[str(t) for t in _as_list(cfg["targets"])] if cfg.get("targets") else None,
+            layout=layout,
+            options={k: v for k, v in cfg.items() if k not in SECTION_KEYS},
         )
         opted_in = sid in OPT_IN_SECTIONS and sid in declared
         if section.is_empty and sid not in ALWAYS_RENDER and not opted_in                 and not cfg.get("always"):
@@ -363,7 +509,8 @@ def _build_sections(raw: dict[str, Any], root: Path, assets_dir: str, banner_dir
     return sections
 
 
-def load(path: Path) -> Config:
+def load(path: Path, *, run_generators: bool = True) -> Config:
+    """Read one ``modpage.yml``; ``run_generators=False`` leaves references empty."""
     if not path.is_file():
         raise ConfigError(f"no config at {path}. Run 'modpage init' to create one.")
     raw = yaml.safe_load(path.read_text(encoding="utf-8")) or {}
@@ -384,6 +531,18 @@ def load(path: Path) -> Config:
     if base_url:
         base_url = str(base_url).rstrip("/") + "/"
     banner_dir = str(assets.get("banner_dir", "banners"))
+
+    # Generators run before anything is normalised, so a generated feature list
+    # is checked and shaped exactly like a hand-written one. `resolve` replaces
+    # every `{from: ...}` / `{use: ...}` reference in the tree with its elements.
+    try:
+        runtime = generators_mod.Runtime(root, raw, assets_dir=assets_dir,
+                                         enabled=run_generators)
+        generated = runtime.run_all() if run_generators else {}
+        raw = runtime.resolve(raw)
+    except generators_mod.GeneratorError as error:
+        raise ConfigError(str(error)) from None
+    warnings = list(runtime.warnings)
 
     links = {str(k): str(v) for k, v in (raw.get("links") or {}).items() if v}
     minecraft = dict(raw.get("minecraft") or {})
@@ -425,6 +584,9 @@ def load(path: Path) -> Config:
         outputs=outputs,
         template=str(raw.get("template", "default")),
         footer=raw.get("footer"),
+        toc=_build_toc(raw, root, assets_dir, banner_dir),
+        generated=generated,
+        warnings=warnings,
     )
 
 

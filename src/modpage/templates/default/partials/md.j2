@@ -31,8 +31,51 @@
 ### {{ section.title }}
 {% endif %}
 {% else %}
+<a id="{{ section.id }}"></a>
 
 ## {{ section.title }}
+{% endif %}
+{% endmacro %}
+
+{#- One entry of the contents list: a link where the target supports anchors,
+    plain text where it does not. -#}
+{%- macro toc_entry(entry) -%}
+{% if entry.anchor %}[{{ entry.title }}](#{{ entry.anchor }}){% else %}{{ entry.title }}{% endif %}
+{%- endmacro -%}
+
+{#- The contents list, rendered between the header and the first section. It
+    mirrors a section header (banner or heading) so the page reads as one. -#}
+{% macro contents() %}
+{% if toc %}
+
+---
+{% if toc.banner %}
+<a id="{{ toc.id }}"></a>
+<p align="center">
+  <img src="{{ asset(toc.banner) }}" alt="{{ toc.title or 'Contents' }}"{% if header.section_banner_width %} width="{{ header.section_banner_width }}"{% endif %}>
+</p>
+{% if toc.title and header.heading_with_banner %}
+
+### {{ toc.title }}
+{% endif %}
+{% elif toc.title %}
+<a id="{{ toc.id }}"></a>
+
+## {{ toc.title }}
+{% endif %}
+{% if toc.style == 'inline' %}
+
+{# A raw HTML block swallows the Markdown inside it, so the inline row links
+   with <a href> rather than [text](#anchor). #}
+<p align="center">
+  {% for entry in toc.entries %}{% if entry.anchor %}<a href="#{{ entry.anchor }}">{{ entry.title }}</a>{% else %}{{ entry.title }}{% endif %}{% if not loop.last %} &nbsp;•&nbsp; {% endif %}{% endfor %}
+</p>
+{% else %}
+
+{% for entry in toc.entries %}
+{% if toc.numbered %}{{ loop.index }}.{% else %}-{% endif %} {{ toc_entry(entry) }}
+{% endfor %}
+{% endif %}
 {% endif %}
 {% endmacro %}
 
@@ -211,7 +254,156 @@
 {% endif %}
 {% endmacro %}
 
-{#- Dispatch: every section id routes to the macro that knows its shape. -#}
+
+{#- ------------------------------------------------------------------------
+    Generated elements.
+
+    A generator hands a section a list of dicts and `layout:` decides how they
+    are drawn. Keeping the layouts here rather than in the generator is what
+    lets one `git.changelog` be a folded release list on GitHub and a pipe
+    table on CurseForge, from a single declaration.
+    ------------------------------------------------------------------------ -#}
+
+{%- macro cell(text) -%}
+{{ (text if text is not none else '') | string | replace('|', '\|') | replace('\n', ' ') }}
+{%- endmacro -%}
+
+{%- macro element_title(item) -%}
+{% if item.url %}[{{ item.title }}]({{ item.url }}){% else %}{{ item.title }}{% endif %}
+{%- endmacro -%}
+
+{%- macro element_line(item) -%}
+{% if item.title %}**{{ element_title(item) }}**{% if item.description %} — {% endif %}{% endif %}{{ item.description or '' }}
+{%- endmacro -%}
+
+{% macro elements_list(items) %}
+
+{% for item in items %}
+- {{ element_line(item) }}
+{% for child in item['items'] or [] %}
+  - {{ element_line(child) }}
+{% endfor %}
+{% endfor %}
+{% endmacro %}
+
+{% macro elements_definition(items) %}
+{% for item in items %}
+
+**{{ element_title(item) }}**{{ ' · <sub>' ~ item.date ~ '</sub>' if item.date else '' }}
+
+{{ item.description or '' }}
+{% endfor %}
+{% endmacro %}
+
+{% macro elements_cards(items) %}
+{% for item in items %}
+{% if item.image or item.src %}
+
+<table><tr>
+<td width="200"><img src="{{ asset(item.image or item.src) }}" alt="{{ item.title }}"></td>
+<td><b>{{ item.title }}</b><br>{{ item.description or '' }}</td>
+</tr></table>
+{% else %}
+
+**{{ element_title(item) }}**
+
+{{ item.description or '' }}
+{% endif %}
+{% endfor %}
+{% endmacro %}
+
+{#- Markdown has no carousel, so a slider is a gallery here; only a target that
+    renders real HTML can make it slide. -#}
+{% macro elements_gallery(items) %}
+{% for item in items %}
+
+<p align="center">
+  <img src="{{ asset(item.image or item.src) }}" alt="{{ item.alt or item.title or cfg.name }}"{% if item.width %} width="{{ item.width }}"{% endif %}>
+{% if item.caption or item.description %}
+  <br><sub><i>{{ item.caption or item.description }}</i></sub>
+{% endif %}
+</p>
+{% endfor %}
+{% endmacro %}
+
+{% macro elements_table(section) %}
+{% set columns = section.data['columns'] %}
+
+|{% for column in columns %} {{ column.title }} |{% endfor %}
+
+|{% for column in columns %} --- |{% endfor %}
+
+{% for item in section.data['elements'] %}
+|{% for column in columns %} {{ cell(item[column.field]) }} |{% endfor %}
+
+{% endfor %}
+{% endmacro %}
+
+{#- One release: a version, when it shipped, and its changes under the heading
+    each change was grouped into. Shared by git.changelog and changelog.file,
+    which deliberately produce the same shape. -#}
+{% macro changelog_release(release) %}
+
+**{{ element_title(release) }}**{% if release.date %} · <sub>{{ release.date }}</sub>{% endif %}
+
+{% if release.body %}
+{{ release.body }}
+{% endif %}
+{% for group in release['groups'] or [] %}
+{% if group.title %}
+
+*{{ group.title }}*
+{% endif %}
+
+{% for change in group['items'] %}
+- {{ change.title }}{{ ' ([`' ~ change.short ~ '`](' ~ change.url ~ '))' if change.url and change.short else '' }}
+{% endfor %}
+{% endfor %}
+{% if not release['groups'] and release.description %}
+
+{{ release.description }}
+{% endif %}
+{% endmacro %}
+
+{% macro elements_changelog(section) %}
+{% for release in section.data['elements'] %}
+{{ changelog_release(release) }}
+{% endfor %}
+{% endmacro %}
+
+{#- Dispatch on the section's layout, optionally folding the whole list away
+    the way the recipe grid does. -#}
+{% macro elements_body(section) %}
+{% if section.layout == 'table' %}
+{{ elements_table(section) }}
+{% elif section.layout == 'changelog' %}
+{{ elements_changelog(section) }}
+{% elif section.layout == 'cards' %}
+{{ elements_cards(section.data['elements']) }}
+{% elif section.layout in ('gallery', 'slider') %}
+{{ elements_gallery(section.data['elements']) }}
+{% elif section.layout == 'definition' %}
+{{ elements_definition(section.data['elements']) }}
+{% else %}
+{{ elements_list(section.data['elements']) }}
+{% endif %}
+{% endmacro %}
+
+{% macro elements(section) %}
+{% if section.options.get('collapsed') %}
+
+<details>
+<summary><b>{{ section.options.get('summary') or (section.data['elements'] | length ~ ' entries -- click to expand') }}</b></summary>
+{{ elements_body(section) }}
+
+</details>
+{% else %}
+{{ elements_body(section) }}
+{% endif %}
+{% endmacro %}
+
+{#- Dispatch: every section id routes to the macro that knows its shape, then
+    any generated elements it carries are drawn by its layout. -#}
 {% macro section_body(section) %}
 {% if section.id == 'dependencies' %}
 {{ dependencies(section) }}
@@ -228,6 +420,9 @@
 {% else %}
 {{ body(section) }}
 {% endif %}
+{% if section.data['elements'] %}
+{{ elements(section) }}
+{% endif %}
 {% endmacro %}
 
 {% macro link_row() %}
@@ -241,6 +436,7 @@
 
 {% macro page(sections) %}
 {{ page_header() }}
+{{ contents() }}
 {% for section in sections %}
 
 ---
